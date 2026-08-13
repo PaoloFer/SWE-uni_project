@@ -3,19 +3,33 @@ from typing import Any
 
 
 class CsvManager:
-    def __init__(self, path: str):
+    def __init__(self, path: str, delimiter: str = ",", has_header: bool = True):
         self.path = path
+        self.delimiter = delimiter
+        self.has_header = has_header
 
     def read(self) -> list[dict[str, Any]]:
+        rows = []
         with open(self.path, newline="", encoding="utf-8") as f:
-            return list(csv.DictReader(f))
+            reader = csv.reader(f, delimiter=self.delimiter)
+            data = list(reader)
+        if not data:
+            return rows
+        if self.has_header:
+            header, body = data[0], data[1:]
+        else:
+            header, body = list(range(1, len(data[0]) + 1)), data
+        for line in body:
+            if any(line):
+                rows.append(dict(zip(header, line)))
+        return rows
 
     def write(self, data: list[dict[str, Any]], fieldnames: list[str] | None = None) -> None:
         rows = list(data)
         if fieldnames is None:
             fieldnames = list(rows[0].keys()) if rows else []
         with open(self.path, "w", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer = csv.DictWriter(f, fieldnames=fieldnames, delimiter=self.delimiter)
             writer.writeheader()
             writer.writerows(rows)
 
