@@ -1,2 +1,2 @@
-id;surname;name;phone
-1;Giacomi;Francesco;34512349
+id;surname;name;phone;doctor_id
+1;Giacomi;Francesco;34512349;M1

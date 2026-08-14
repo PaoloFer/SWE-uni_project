@@ -1,0 +1,81 @@
+{% extends "patient/base.html" %}
+{% block title %}Registra assunzione{% endblock %}
+
+{% block content %}
+    <h2>Registrare assunzione di farmaco/insulina</h2>
+
+    <form method="post" action="{{ url_for('patient.assunzioni') }}">
+        <label>
+            Data
+            <input type="date" name="assumed_on" required>
+        </label>
+        <label>
+            Ora
+            <input type="time" name="assumed_at">
+        </label>
+        <label>
+            Farmaco
+            <input type="text" name="drug" list="drugs" placeholder="es. metformina" required>
+        </label>
+        <datalist id="drugs">
+            {% for t in therapies %}
+                <option value="{{ t.drug }}">{{ t.drug }} - {{ t.dose }} ({{ t.indications }})</option>
+            {% endfor %}
+        </datalist>
+        <label>
+            Quantità
+            <input type="text" name="quantity" placeholder="es. 1 compressa, 10 UI" required>
+        </label>
+        <button type="submit">Salva</button>
+    </form>
+
+    {% if therapies %}
+        <h3>Terapie prescritte dal diabetologo</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Farmaco</th>
+                    <th>Ass. giornaliere</th>
+                    <th>Dose</th>
+                    <th>Indicazioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in therapies %}
+                    <tr>
+                        <td>{{ t.drug }}</td>
+                        <td>{{ t.daily_frequency }}</td>
+                        <td>{{ t.dose }}</td>
+                        <td>{{ t.indications }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <h3>Assunzioni registrate</h3>
+    {% if assunzioni %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Ora</th>
+                    <th>Farmaco</th>
+                    <th>Quantità</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in assunzioni %}
+                    <tr>
+                        <td>{{ a.assumed_on }}</td>
+                        <td>{{ a.assumed_at or '-' }}</td>
+                        <td>{{ a.drug }}</td>
+                        <td>{{ a.quantity }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nessuna assunzione registrata.</p>
+    {% endif %}
+{% endblock %}

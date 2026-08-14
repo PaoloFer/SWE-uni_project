@@ -1,0 +1,50 @@
+{% extends "patient/base.html" %}
+{% block title %}Segnala sintomi, patologie o terapie concomitanti{% endblock %}
+
+{% block content %}
+    <h2>Segnalare sintomi, patologie e/o terapie concomitanti</h2>
+
+    <form method="post" action="{{ url_for('patient.concomitant') }}">
+        <label>
+            Tipo
+            <select name="type" required>
+                <option value="sintomo">Sintomo</option>
+                <option value="patologia">Patologia</option>
+                <option value="terapia">Terapia concomitante</option>
+            </select>
+        </label>
+        <label>
+            Descrizione
+            <input type="text" name="description" placeholder="es. ipertensione, farmaco X" required>
+        </label>
+        <label>
+            Periodo associato
+            <input type="text" name="period" placeholder="es. da giugno 2026, gennaio-marzo 2026">
+        </label>
+        <button type="submit">Salva</button>
+    </form>
+
+    <h3>Segnalazioni registrate</h3>
+    {% if entries %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Descrizione</th>
+                    <th>Periodo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in entries %}
+                    <tr>
+                        <td>{{ e.type }}</td>
+                        <td>{{ e.description }}</td>
+                        <td>{{ e.period or '-' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nessuna segnalazione registrata.</p>
+    {% endif %}
+{% endblock %}

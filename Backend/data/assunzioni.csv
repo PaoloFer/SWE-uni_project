@@ -1,1 +1,1 @@
-patient_id;assumed_on;drug;quantity
+patient_id;assumed_on;assumed_at;drug;quantity

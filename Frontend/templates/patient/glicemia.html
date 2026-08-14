@@ -1,0 +1,55 @@
+{% extends "patient/base.html" %}
+{% block title %}Inserisci glicemia{% endblock %}
+
+{% block content %}
+    <h2>Inserire rilevazione di glicemia</h2>
+
+    <form method="post" action="{{ url_for('patient.glicemia') }}">
+        <label>
+            Data
+            <input type="date" name="measured_on" required>
+        </label>
+        <label>
+            Ora
+            <input type="time" name="measured_at">
+        </label>
+        <label>
+            Momento del pasto
+            <select name="meal" required>
+                <option value="pre">Pre-pasto</option>
+                <option value="post">Post-pasto</option>
+            </select>
+        </label>
+        <label>
+            Valore (mg/dL)
+            <input type="number" name="value" min="1" step="1" required>
+        </label>
+        <button type="submit">Salva</button>
+    </form>
+
+    <h3>Cronologia rilevazioni</h3>
+    {% if readings %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Ora</th>
+                    <th>Momento</th>
+                    <th>Valore (mg/dL)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for g in readings %}
+                    <tr>
+                        <td>{{ g.measured_on }}</td>
+                        <td>{{ g.measured_at or '-' }}</td>
+                        <td>{{ "pre-pasto" if g.meal == "pre" else "post-pasto" }}</td>
+                        <td>{{ g.value }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nessuna rilevazione registrata.</p>
+    {% endif %}
+{% endblock %}
