@@ -1,11 +1,12 @@
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
+import config
 from admin.usecases import AdminUseCases
 from auth.decorators import login_required, role_required
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
-_usecases = AdminUseCases("./data")
+_usecases = AdminUseCases(config.DATA_DIR)
 
 
 @admin_bp.route("/")

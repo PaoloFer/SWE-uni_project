@@ -1,3 +1,4 @@
+import re
 from datetime import date, datetime, timedelta
 
 from utils.csv_utils import CsvManager
@@ -65,6 +66,13 @@ class SystemUseCases:
     def verify_intake_consistency(self) -> list:
         findings = []
         intakes = self.assunzioni.read()
+        by_patient_drug_day = {}
+        for intake in intakes:
+            patient_id = intake["patient_id"]
+            drug = intake["drug"]
+            key = (patient_id, drug.lower(), intake.get("assumed_on", ""))
+            by_patient_drug_day[key] = by_patient_drug_day.get(key, 0) + 1
+
         for intake in intakes:
             patient_id = intake["patient_id"]
             drug = intake["drug"]
@@ -78,7 +86,46 @@ class SystemUseCases:
                     "intake": intake,
                     "issue": "assunzione per farmaco non prescritto o terapia non attiva",
                 })
+                continue
+
+            issues = self._check_intake_quantity(intake, therapy)
+            issues += self._check_daily_frequency(intake, therapy, by_patient_drug_day)
+            for issue in issues:
+                findings.append({"intake": intake, "issue": issue})
         return findings
+
+    def _check_intake_quantity(self, intake, therapy) -> list:
+        dose_num = self._extract_number(therapy.get("dose", ""))
+        qty_num = self._extract_number(intake.get("quantity", ""))
+        if dose_num is None or qty_num is None:
+            return []
+        if qty_num > dose_num:
+            return [(
+                f"quantità ({intake.get('quantity')}) superiore alla dose "
+                f"prescritta ({therapy.get('dose')})"
+            )]
+        return []
+
+    def _check_daily_frequency(self, intake, therapy, by_patient_drug_day) -> list:
+        try:
+            expected = int(therapy["daily_frequency"])
+        except (ValueError, TypeError, KeyError):
+            return []
+        key = (intake["patient_id"], intake["drug"].lower(), intake.get("assumed_on", ""))
+        count = by_patient_drug_day.get(key, 0)
+        if count > expected:
+            return [(
+                f"{count} assunzioni il {intake.get('assumed_on')}, oltre la "
+                f"frequenza giornaliera prescritta ({expected})"
+            )]
+        return []
+
+    @staticmethod
+    def _extract_number(text) -> float | None:
+        match = re.search(r"(\d+(?:[.,]\d+)?)", str(text))
+        if not match:
+            return None
+        return float(match.group(1).replace(",", "."))
 
     # UC-S3 / UC-S4: sollecitare l'inserimento delle assunzioni e alert al paziente
     def check_missing_intakes(self, reference=None) -> list:

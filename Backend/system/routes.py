@@ -1,11 +1,12 @@
 from flask import Blueprint, redirect, render_template, session, url_for
 
+import config
 from auth.decorators import login_required, role_required
 from system.usecases import SystemUseCases
 
 system_bp = Blueprint("system", __name__, url_prefix="/system")
 
-_usecases = SystemUseCases("./data")
+_usecases = SystemUseCases(config.DATA_DIR)
 
 
 @system_bp.before_request

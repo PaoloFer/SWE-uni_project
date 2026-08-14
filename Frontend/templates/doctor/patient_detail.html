@@ -91,6 +91,56 @@
         <p>Nessun sintomo segnalato.</p>
     {% endif %}
 
+    <h3>Assunzioni registrate dal paziente</h3>
+    {% if data.assunzioni %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Ora</th>
+                    <th>Farmaco</th>
+                    <th>Quantità</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in data.assunzioni %}
+                    <tr>
+                        <td>{{ a.assumed_on }}</td>
+                        <td>{{ a.assumed_at or '-' }}</td>
+                        <td>{{ a.drug }}</td>
+                        <td>{{ a.quantity }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nessuna assunzione registrata.</p>
+    {% endif %}
+
+    <h3>Segnalazioni concomitanti</h3>
+    {% if data.concomitant %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Descrizione</th>
+                    <th>Periodo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in data.concomitant %}
+                    <tr>
+                        <td>{{ c.type }}</td>
+                        <td>{{ c.description }}</td>
+                        <td>{{ c.period or '-' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nessuna segnalazione concomitante.</p>
+    {% endif %}
+
     <h3>Informazioni cliniche</h3>
     {% if data.clinical_info %}
         {% for i in data.clinical_info %}

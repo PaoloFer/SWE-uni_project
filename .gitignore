@@ -9,3 +9,4 @@ venv/
 
 # Test
 Backend/.test_data_backup/
+Backend/.test_data/

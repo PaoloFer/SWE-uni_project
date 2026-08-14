@@ -11,6 +11,8 @@ class DoctorUseCases:
         self.notifications = CsvManager(f"{data_dir}/notifications.csv", delimiter=";")
         self.glicemia = CsvManager(f"{data_dir}/glicemia.csv", delimiter=";")
         self.symptoms = CsvManager(f"{data_dir}/symptoms.csv", delimiter=";")
+        self.assunzioni = CsvManager(f"{data_dir}/assunzioni.csv", delimiter=";")
+        self.concomitant = CsvManager(f"{data_dir}/concomitant.csv", delimiter=";")
 
     def _next_id(self, manager) -> int:
         rows = manager.read()
@@ -73,6 +75,8 @@ class DoctorUseCases:
             "therapies": self.therapies.find(patient_id=str(patient_id)),
             "glicemia": self.glicemia.find(patient_id=str(patient_id)),
             "symptoms": self.symptoms.find(patient_id=str(patient_id)),
+            "assunzioni": self.assunzioni.find(patient_id=str(patient_id)),
+            "concomitant": self.concomitant.find(patient_id=str(patient_id)),
             "clinical_info": self.patient_info.find(patient_id=str(patient_id)),
         }
 

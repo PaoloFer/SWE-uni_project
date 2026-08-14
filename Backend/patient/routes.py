@@ -1,13 +1,14 @@
 from flask import Blueprint, redirect, render_template, request, session, url_for
 
+import config
 from auth.decorators import login_required, role_required
 from patient.usecases import PatientUseCases
 from system.usecases import SystemUseCases
 
 patient_bp = Blueprint("patient", __name__, url_prefix="/patient")
 
-_usecases = PatientUseCases("./data")
-_system = SystemUseCases("./data")
+_usecases = PatientUseCases(config.DATA_DIR)
+_system = SystemUseCases(config.DATA_DIR)
 
 
 def _current_patient() -> str:

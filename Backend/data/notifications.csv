@@ -8,3 +8,5 @@ id;doctor_id;patient_id;type;severity;message;created_on;read
 7;M1;1;glicemia;alta;Paziente 1: iperglicemia post-pasto 1000 mg/dL il 2026-08-14.;2026-08-14;0
 8;M1;1;glicemia;alta;Paziente 1: iperglicemia pre-pasto 1000 mg/dL il 2026-08-14.;2026-08-14;0
 9;M1;1;glicemia;alta;Paziente 1: iperglicemia pre-pasto 15000 mg/dL il 2026-08-14.;2026-08-14;0
+10;M1;1;contact;info;"Richiesta del paziente: prova
+";2026-08-14T19:46;0

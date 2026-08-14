@@ -1,10 +1,11 @@
 from flask import Blueprint, jsonify, redirect, render_template, request, session, url_for
 
+import config
 from auth.usecases import AuthService
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
-_usecases = AuthService("./data")
+_usecases = AuthService(config.DATA_DIR)
 
 ROLE_HOME = {
     "doctor": "doctor.dashboard",

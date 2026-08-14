@@ -4,20 +4,54 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
-BACKUP = os.path.join(os.path.dirname(__file__), ".test_data_backup")
+PROJECT_DATA = os.path.join(os.path.dirname(__file__), "data")
+TEST_DATA = os.path.join(os.path.dirname(__file__), ".test_data")
+
+EMPTY = {
+    "assunzioni.csv": "patient_id;assumed_on;assumed_at;drug;quantity\n",
+    "concomitant.csv": "patient_id;type;description;period\n",
+    "contacts.csv": "id;patient_id;doctor_id;message;created_on\n",
+    "operations.csv": "id;doctor_id;operation;details;executed_on\n",
+    "symptoms.csv": "patient_id;reported_on;symptom\n",
+}
 
 
-def backup_data():
-    if os.path.exists(BACKUP):
-        shutil.rmtree(BACKUP)
-    shutil.copytree(DATA_DIR, BACKUP)
+def setup_test_data():
+    if os.path.exists(TEST_DATA):
+        shutil.rmtree(TEST_DATA)
+    os.makedirs(TEST_DATA)
+    with open(f"{TEST_DATA}/associations.csv", "w", encoding="utf-8") as f:
+        f.write("patient_id;doctor_id\n1;M1\n")
+    with open(f"{TEST_DATA}/doctors.csv", "w", encoding="utf-8") as f:
+        f.write("id;name;surname;email\nM1;Mario;Rossi;mario.rossi@example.com\n")
+    with open(f"{TEST_DATA}/patient.csv", "w", encoding="utf-8") as f:
+        f.write("id;surname;name;phone\n1;Giacomi;Francesco;34512349\n")
+    with open(f"{TEST_DATA}/therapies.csv", "w", encoding="utf-8") as f:
+        f.write("id;patient_id;drug;daily_frequency;dose;indications;prescribed_by;prescribed_on;modified_by;modified_on;active\n"
+                "1;1;prova;5;500mg;dopo i pasti;M1;2026-08-14;;;1\n")
+    with open(f"{TEST_DATA}/notifications.csv", "w", encoding="utf-8") as f:
+        f.write("id;doctor_id;patient_id;type;severity;message;created_on;read\n")
+    with open(f"{TEST_DATA}/patient_info.csv", "w", encoding="utf-8") as f:
+        f.write("patient_id;risk_factors;past_pathologies;comorbidities;updated_by;updated_on\n")
+    with open(f"{TEST_DATA}/glicemia.csv", "w", encoding="utf-8") as f:
+        f.write("patient_id;measured_on;measured_at;meal;value\n")
+    for name, content in EMPTY.items():
+        with open(f"{TEST_DATA}/{name}", "w", encoding="utf-8") as f:
+            f.write(content)
+    with open(f"{PROJECT_DATA}/users.csv", encoding="utf-8") as src:
+        lines = src.readlines()
+    with open(f"{TEST_DATA}/users.csv", "w", encoding="utf-8") as f:
+        f.write("".join(lines[:4]))
+    os.environ["DATA_DIR"] = TEST_DATA
 
 
-def restore_data():
-    shutil.rmtree(DATA_DIR)
-    shutil.copytree(BACKUP, DATA_DIR)
+def teardown_test_data():
+    os.environ.pop("DATA_DIR", None)
+    if os.path.exists(TEST_DATA):
+        shutil.rmtree(TEST_DATA)
 
+
+setup_test_data()
 
 from main import app
 
@@ -29,7 +63,6 @@ def check(label, cond):
     print(("PASS" if cond else "FAIL"), "-", label)
 
 
-backup_data()
 try:
     # 1. Login admin
     r = client.post("/auth/login", data={"username": "admin", "password": "admin"})
@@ -86,10 +119,24 @@ try:
     payload = r.get_json() or []
     check("doctor sees contact notification", any("Ho una domanda" in n.get("message", "") for n in payload))
 
-    # 11. Doctor patients list shows reference doctor column
+    # 10b. Doctor patient detail shows assunzioni/concomitanti sections
+    r = client.get("/doctor/patients/2")
+    body = r.get_data(as_text=True)
+    check("doctor patient detail has assunzioni section", "Assunzioni registrate dal paziente" in body)
+    check("doctor patient detail has concomitant section", "Segnalazioni concomitanti" in body)
+
+    # 11. Doctor patients list shows only own patients
     r = client.get("/doctor/patients")
     body = r.get_data(as_text=True)
+    check("doctor patients list has own patient", "Verdi" in body and "Luca" in body)
     check("doctor patients list has reference", "Anna Bianchi" in body)
+    check("doctor patients list excludes other doctor's patient", "Giacomi" not in body)
+
+    # 11b. Doctor cannot open another doctor's patient detail
+    r = client.get("/doctor/patients/1")
+    check("doctor blocked from other doctor's patient", r.status_code == 404)
+    r = client.get("/doctor/patients/1/trend")
+    check("doctor blocked from other doctor's patient trend", r.status_code == 404)
 
     # 12. Update doctor password via admin
     client.get("/auth/logout")
@@ -119,9 +166,28 @@ try:
 
     # 15. system usecase reference doctor from associations (patient 1 -> M1)
     from system.usecases import SystemUseCases
-    su = SystemUseCases("./data")
+    su = SystemUseCases(TEST_DATA)
     check("reference doctor patient 1 = M1", su._reference_doctor("1") == "M1")
+
+    # 16. UC-S2: quantity above prescribed dose is flagged
+    from utils.csv_utils import CsvManager
+    assunzioni = CsvManager(f"{TEST_DATA}/assunzioni.csv", delimiter=";")
+    assunzioni.append({
+        "patient_id": "1", "assumed_on": "2026-08-14", "assumed_at": "08:00",
+        "drug": "prova", "quantity": "1000 mg",
+    })
+    issues = su.verify_intake_consistency()
+    check("UC-S2 flags quantity above dose", any("quantità" in i["issue"] and "superiore" in i["issue"] for i in issues))
+
+    # 17. UC-S2: daily frequency exceeded is flagged (therapy prova freq 5, record 6 intakes)
+    for _ in range(6):
+        assunzioni.append({
+            "patient_id": "1", "assumed_on": "2026-08-13", "assumed_at": "",
+            "drug": "prova", "quantity": "1",
+        })
+    issues = su.verify_intake_consistency()
+    check("UC-S2 flags frequency exceeded", any("frequenza giornaliera" in i["issue"] for i in issues))
 
     print("DONE")
 finally:
-    restore_data()
+    teardown_test_data()
