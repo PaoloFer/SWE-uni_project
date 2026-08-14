@@ -12,6 +12,17 @@ ambiente di sviluppo/test e vengono salvate **hashate** in
 | `fgiacomi` | `password` | patient | 1         | `/patient/`        |
 | `admin`    | `admin`    | system  | SYSTEM1   | `/system/`         |
 
+## Dati iniziali
+
+Pazienti, medici e la relazione paziente–medico sono salvati in:
+
+- `Backend/data/patient.csv` — anagrafica pazienti
+- `Backend/data/doctors.csv` — anagrafica medici (con email)
+- `Backend/data/associations.csv` — relazione paziente↔medico di riferimento
+
+I dati iniziali e le credenziali di pazienti e medici vengono inseriti dal
+responsabile del servizio tramite l'area amministrazione (`/admin/`).
+
 ## Come testare
 
 1. Avvia il server (dalla cartella `Backend`):
@@ -27,8 +38,9 @@ ambiente di sviluppo/test e vengono salvate **hashate** in
 
 - Dopo il login si viene reindirizzati alla dashboard del proprio ruolo:
   - **doctor** → gestione pazienti, terapie, info cliniche, notifiche
-  - **patient** → area paziente (placeholder)
-  - **system** → inserimento dati iniziali (placeholder)
+  - **patient** → area paziente
+  - **system** → area responsabile del servizio: controlli, operazioni e
+    amministrazione dei dati (`/admin/`)
 - Le altre aree sono protette: un utente non può accedere a dashboard di
   ruoli diversi.
 - Queste credenziali NON sono adatte alla produzione. In produzione

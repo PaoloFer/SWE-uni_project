@@ -35,6 +35,7 @@ def dashboard():
         entity_id=_current_patient(),
         data=_dashboard_data(_current_patient()),
         notifications=notifications,
+        reference_doctor=_usecases.view_reference_doctor(_current_patient()),
     )
 
 
@@ -154,6 +155,7 @@ def contact():
         current_username=session.get("username"),
         entity_id=patient_id,
         contacts=contacts,
+        reference_doctor=_usecases.view_reference_doctor(patient_id),
     )
 
 

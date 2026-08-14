@@ -11,6 +11,7 @@
                     <th>Nome</th>
                     <th>Cognome</th>
                     <th>Telefono</th>
+                    <th>Medico di riferimento</th>
                     <th></th>
                 </tr>
             </thead>
@@ -21,6 +22,7 @@
                         <td>{{ p.name }}</td>
                         <td>{{ p.surname }}</td>
                         <td>{{ p.phone }}</td>
+                        <td>{{ p.reference_doctor }}</td>
                         <td>
                             <a class="button" href="{{ url_for('doctor.patient_detail', patient_id=p.id) }}">Scheda</a>
                         </td>

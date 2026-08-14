@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Area Amministrazione - Telemedicina{% endblock %}
+{% block header %}Area Amministrazione{% endblock %}
+
+{% block nav %}
+    <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('admin.patients') }}">Pazienti</a>
+    <a href="{{ url_for('admin.doctors') }}">Medici</a>
+    <a href="{{ url_for('admin.associations') }}">Associazioni</a>
+    <a href="{{ url_for('system.operations') }}">Operazioni</a>
+    <a href="{{ url_for('auth.logout') }}">Esci</a>
+{% endblock %}

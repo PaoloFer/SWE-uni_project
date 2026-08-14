@@ -1,0 +1,106 @@
+{% extends "admin/base.html" %}
+{% block title %}Medici - Amministrazione{% endblock %}
+
+{% block content %}
+    <h2>Gestione medici</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+                {% for category, message in messages %}
+                    <li class="{{ 'error' if category == 'error' else '' }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <h3>Nuovo medico</h3>
+    <form method="post" action="{{ url_for('admin.create_doctor') }}">
+        <label>
+            Nome
+            <input type="text" name="name" required>
+        </label>
+        <label>
+            Cognome
+            <input type="text" name="surname" required>
+        </label>
+        <label>
+            Email
+            <input type="email" name="email">
+        </label>
+        <label>
+            Username
+            <input type="text" name="username" required>
+        </label>
+        <label>
+            Password
+            <input type="password" name="password" required>
+        </label>
+        <button type="submit">Crea medico</button>
+    </form>
+
+    <h3>Elenco medici</h3>
+    {% if doctors %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Cognome</th>
+                    <th>Email</th>
+                    <th>Username</th>
+                    <th>N. pazienti</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in doctors %}
+                    <tr>
+                        <td>{{ d.id }}</td>
+                        <td>{{ d.name }}</td>
+                        <td>{{ d.surname }}</td>
+                        <td>{{ d.email }}</td>
+                        <td>{{ d.username }}</td>
+                        <td>{{ d.patient_count }}</td>
+                        <td>
+                            <div class="cell-actions">
+                                <details>
+                                    <summary>Modifica</summary>
+                                <form method="post" action="{{ url_for('admin.edit_doctor', doctor_id=d.id) }}">
+                                    <label>
+                                        Nome
+                                        <input type="text" name="name" value="{{ d.name }}">
+                                    </label>
+                                    <label>
+                                        Cognome
+                                        <input type="text" name="surname" value="{{ d.surname }}">
+                                    </label>
+                                    <label>
+                                        Email
+                                        <input type="email" name="email" value="{{ d.email }}">
+                                    </label>
+                                    <label>
+                                        Username
+                                        <input type="text" name="username" value="{{ d.username }}">
+                                    </label>
+                                    <label>
+                                        Password (lascia vuota per non cambiarla)
+                                        <input type="password" name="password">
+                                    </label>
+                                    <button type="submit">Salva</button>
+                                </form>
+                            </details>
+                            <form method="post" action="{{ url_for('admin.delete_doctor', doctor_id=d.id) }}"
+                                  onsubmit="return confirm('Eliminare il medico {{ d.name }} {{ d.surname }}?');">
+                                <button type="submit" style="background:#d9534f">Elimina</button>
+                            </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nessun medico registrato.</p>
+    {% endif %}
+{% endblock %}

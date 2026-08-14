@@ -6,6 +6,16 @@
     <p>Benvenuto, <strong>{{ current_username }}</strong> (ID {{ entity_id }}).</p>
 
     <p>
+        {% if reference_doctor %}
+            <strong>Medico di riferimento:</strong>
+            {{ reference_doctor.name }} {{ reference_doctor.surname }}
+            ({{ reference_doctor.email or "email non disponibile" }})
+        {% else %}
+            <span class="muted">Nessun medico di riferimento assegnato.</span>
+        {% endif %}
+    </p>
+
+    <p>
         <a class="button" href="{{ url_for('patient.glicemia') }}">+ Inserisci glicemia</a>
         <a class="button" href="{{ url_for('patient.symptoms') }}">+ Aggiungi sintomo</a>
         <a class="button" href="{{ url_for('patient.assunzioni') }}">+ Registra assunzione</a>

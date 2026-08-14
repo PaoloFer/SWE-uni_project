@@ -1,2 +1,5 @@
-id;surname;name;phone;doctor_id
-1;Giacomi;Francesco;34512349;M1
+id;surname;name;phone
+1;Giacomi;Francesco;34512349
+2;Niccolini;Tommaso;3331234567
+3;Nenz;Carlo;3337654321
+4;Nuggets;Abham;3291112233

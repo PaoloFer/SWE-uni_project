@@ -1,0 +1,126 @@
+{% extends "admin/base.html" %}
+{% block title %}Pazienti - Amministrazione{% endblock %}
+
+{% block content %}
+    <h2>Gestione pazienti</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+                {% for category, message in messages %}
+                    <li class="{{ 'error' if category == 'error' else '' }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <h3>Nuovo paziente</h3>
+    <form method="post" action="{{ url_for('admin.create_patient') }}">
+        <label>
+            Nome
+            <input type="text" name="name" required>
+        </label>
+        <label>
+            Cognome
+            <input type="text" name="surname" required>
+        </label>
+        <label>
+            Telefono
+            <input type="text" name="phone">
+        </label>
+        <label>
+            Medico di riferimento
+            <select name="doctor_id">
+                <option value="">— nessuno —</option>
+                {% for d in doctors %}
+                    <option value="{{ d.id }}">{{ d.name }} {{ d.surname }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>
+            Username
+            <input type="text" name="username" required>
+        </label>
+        <label>
+            Password
+            <input type="password" name="password" required>
+        </label>
+        <button type="submit">Crea paziente</button>
+    </form>
+
+    <h3>Elenco pazienti</h3>
+    {% if patients %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Cognome</th>
+                    <th>Telefono</th>
+                    <th>Medico di riferimento</th>
+                    <th>Username</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in patients %}
+                    <tr>
+                        <td>{{ p.id }}</td>
+                        <td>{{ p.name }}</td>
+                        <td>{{ p.surname }}</td>
+                        <td>{{ p.phone }}</td>
+                        <td>{{ p.reference_doctor or "—" }}</td>
+                        <td>{{ p.username }}</td>
+                        <td>
+                            <div class="cell-actions">
+                                <details>
+                                    <summary>Modifica</summary>
+                                <form method="post" action="{{ url_for('admin.edit_patient', patient_id=p.id) }}">
+                                    <label>
+                                        Nome
+                                        <input type="text" name="name" value="{{ p.name }}">
+                                    </label>
+                                    <label>
+                                        Cognome
+                                        <input type="text" name="surname" value="{{ p.surname }}">
+                                    </label>
+                                    <label>
+                                        Telefono
+                                        <input type="text" name="phone" value="{{ p.phone }}">
+                                    </label>
+                                    <label>
+                                        Medico di riferimento
+                                        <select name="doctor_id">
+                                            <option value="">— nessuno —</option>
+                                            {% for d in doctors %}
+                                                <option value="{{ d.id }}" {{ 'selected' if d.id == p.doctor_id }}>
+                                                    {{ d.name }} {{ d.surname }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </label>
+                                    <label>
+                                        Username
+                                        <input type="text" name="username" value="{{ p.username }}">
+                                    </label>
+                                    <label>
+                                        Password (lascia vuota per non cambiarla)
+                                        <input type="password" name="password">
+                                    </label>
+                                    <button type="submit">Salva</button>
+                                </form>
+                            </details>
+                            <form method="post" action="{{ url_for('admin.delete_patient', patient_id=p.id) }}"
+                                  onsubmit="return confirm('Eliminare il paziente {{ p.name }} {{ p.surname }}?');">
+                                <button type="submit" style="background:#d9534f">Elimina</button>
+                            </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nessun paziente registrato.</p>
+    {% endif %}
+{% endblock %}

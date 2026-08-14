@@ -5,6 +5,9 @@
 
 {% block nav %}
     <a href="{{ url_for('system.dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('admin.patients') }}">Pazienti</a>
+    <a href="{{ url_for('admin.doctors') }}">Medici</a>
+    <a href="{{ url_for('admin.associations') }}">Associazioni</a>
     <a href="{{ url_for('system.operations') }}">Operazioni</a>
     <a href="{{ url_for('auth.logout') }}">Esci</a>
 {% endblock %}
@@ -12,6 +15,14 @@
 {% block content %}
     <h2>Dashboard responsabile del servizio</h2>
     <p>Benvenuto, {{ current_username }}.</p>
+
+    <h3>Dati iniziali (UC-R1)</h3>
+    <p>Inserisci i dati anagrafici di pazienti e medici con le relative credenziali:</p>
+    <p>
+        <a class="button" href="{{ url_for('admin.patients') }}">Pazienti</a>
+        <a class="button" href="{{ url_for('admin.doctors') }}">Medici</a>
+        <a class="button" href="{{ url_for('admin.associations') }}">Associazioni</a>
+    </p>
 
     <h3>Controlli automatici del sistema</h3>
     <p>Esegui i controlli previsti dagli use case UC-S2/UC-S3/UC-S5/UC-S6:</p>

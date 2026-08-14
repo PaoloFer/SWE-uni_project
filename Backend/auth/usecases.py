@@ -29,6 +29,30 @@ class AuthService:
         self.users.append(user)
         return user
 
+    def get_user_by_entity(self, entity_id: str, role: str | None = None) -> dict | None:
+        rows = self.users.find(entity_id=str(entity_id))
+        if role is not None:
+            rows = [r for r in rows if r["role"] == role]
+        return rows[0] if rows else None
+
+    def update_user(self, user_id: str, username: str | None = None,
+                    password: str | None = None) -> dict | None:
+        rows = self.users.read()
+        for row in rows:
+            if row["id"] == str(user_id):
+                if username and username != row["username"]:
+                    if self.users.find(username=username):
+                        raise ValueError("username già esistente")
+                    row["username"] = username
+                if password:
+                    row["password_hash"] = generate_password_hash(password)
+                self.users.write(rows)
+                return row
+        return None
+
+    def delete_user(self, user_id: str) -> int:
+        return self.users.delete(id=str(user_id))
+
     def _next_id(self) -> int:
         ids = [int(r["id"]) for r in self.users.read() if r.get("id", "").isdigit()]
         return max(ids) + 1 if ids else 1

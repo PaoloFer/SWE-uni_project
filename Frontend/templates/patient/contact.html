@@ -5,6 +5,20 @@
     <h2>Contattare il medico di riferimento</h2>
     <p>Invia una richiesta o una domanda al tuo medico di riferimento.</p>
 
+    {% if reference_doctor %}
+        <p>
+            Medico di riferimento:
+            <strong>{{ reference_doctor.name }} {{ reference_doctor.surname }}</strong>
+            {% if reference_doctor.email %}
+                (<a href="mailto:{{ reference_doctor.email }}">{{ reference_doctor.email }}</a>)
+            {% else %}
+                (email non disponibile)
+            {% endif %}
+        </p>
+    {% else %}
+        <p class="muted">Nessun medico di riferimento assegnato.</p>
+    {% endif %}
+
     <form method="post" action="{{ url_for('patient.contact') }}">
         <label>
             Messaggio

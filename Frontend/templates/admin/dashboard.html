@@ -1,0 +1,20 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Dashboard admin - Telemedicina{% endblock %}
+
+{% block content %}
+    <h2>Dashboard responsabile del servizio</h2>
+    <p>Benvenuto, {{ current_username }}.</p>
+
+    <p>
+        <a class="button" href="{{ url_for('admin.patients') }}">Gestisci pazienti</a>
+        <a class="button" href="{{ url_for('admin.doctors') }}">Gestisci medici</a>
+        <a class="button" href="{{ url_for('admin.associations') }}">Associa pazienti e medici</a>
+    </p>
+
+    <h3>Inserimento dati iniziali (UC-R1)</h3>
+    <p>
+        Da questa area il responsabile del servizio inserisce i dati anagrafici di
+        pazienti e medici e le relative credenziali necessarie all'autenticazione.
+    </p>
+{% endblock %}

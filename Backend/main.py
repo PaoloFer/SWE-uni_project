@@ -9,11 +9,13 @@ app = Flask(
 )
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
 
+from admin.routes import admin_bp
 from auth.routes import auth_bp
 from doctor.routes import doctor_bp
 from patient.routes import patient_bp
 from system.routes import system_bp
 
+app.register_blueprint(admin_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(doctor_bp)
 app.register_blueprint(patient_bp)

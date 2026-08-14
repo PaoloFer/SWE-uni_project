@@ -194,12 +194,11 @@ class SystemUseCases:
         return "alta" if value >= 220 else "media"
 
     def _reference_doctor(self, patient_id) -> str | None:
-        therapy = next(
-            (t for t in self._active_therapies()
-             if t["patient_id"] == str(patient_id) and t.get("prescribed_by")),
-            None,
+        associations = CsvManager(f"{self.data_dir}/associations.csv", delimiter=";")
+        assoc = next(
+            (r for r in associations.read() if r.get("patient_id") == str(patient_id)), None
         )
-        return therapy["prescribed_by"] if therapy else None
+        return assoc["doctor_id"] if assoc else None
 
     # UC-S7: tracciare le operazioni dei medici
     def log_operation(self, doctor_id, operation, details="") -> dict:

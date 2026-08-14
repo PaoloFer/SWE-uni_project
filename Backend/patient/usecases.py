@@ -66,11 +66,11 @@ class PatientUseCases:
 
     # UC-P5: Contattare il medico di riferimento
     def contact_doctor(self, patient_id, message):
-        patient = CsvManager(f"{self.data_dir}/patient.csv", delimiter=";")
-        record = next(
-            (r for r in patient.read() if r.get("id") == str(patient_id)), None
+        associations = CsvManager(f"{self.data_dir}/associations.csv", delimiter=";")
+        assoc = next(
+            (r for r in associations.read() if r.get("patient_id") == str(patient_id)), None
         )
-        doctor_id = record.get("doctor_id", "") if record else ""
+        doctor_id = assoc.get("doctor_id", "") if assoc else ""
 
         contact = {
             "id": str(self._next_id(self.contacts)),
@@ -102,6 +102,27 @@ class PatientUseCases:
         if active_only:
             rows = [r for r in rows if r.get("active", "1") == "1"]
         return rows
+
+    # Helper: medico di riferimento del paziente
+    def view_reference_doctor(self, patient_id):
+        associations = CsvManager(f"{self.data_dir}/associations.csv", delimiter=";")
+        assoc = next(
+            (r for r in associations.read() if r.get("patient_id") == str(patient_id)), None
+        )
+        if not assoc or not assoc.get("doctor_id"):
+            return None
+        doctors = CsvManager(f"{self.data_dir}/doctors.csv", delimiter=";")
+        record = next(
+            (r for r in doctors.read() if r.get("id") == assoc["doctor_id"]), None
+        )
+        if record is None:
+            return None
+        return {
+            "id": record.get("id"),
+            "name": record.get("name"),
+            "surname": record.get("surname"),
+            "email": record.get("email"),
+        }
 
     # UC-P6: Consultare le proprie notifiche
     def view_notifications(self, patient_id, unread_only=True):

@@ -69,9 +69,27 @@ class CsvManager:
         if not self._exists_unsafe() or self._is_empty_unsafe():
             self._write_unsafe(rows)
             return
+        with open(self.path, "r", newline="", encoding="utf-8") as f:
+            content = f.read()
+        prefix = "" if content.endswith("\n") else "\n"
+        fieldnames = self._header_unsafe()
+        if not fieldnames:
+            fieldnames = list(rows[0].keys())
         with open(self.path, "a", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()), delimiter=self.delimiter)
+            if prefix:
+                f.write(prefix)
+            writer = csv.DictWriter(f, fieldnames=fieldnames, delimiter=self.delimiter)
             writer.writerows(rows)
+
+    def _header_unsafe(self) -> list[str]:
+        try:
+            with open(self.path, newline="", encoding="utf-8") as f:
+                first = f.readline().rstrip("\r\n")
+        except FileNotFoundError:
+            return []
+        if not first:
+            return []
+        return first.split(self.delimiter)
 
     def _is_empty_unsafe(self) -> bool:
         try:

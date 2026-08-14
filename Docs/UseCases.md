@@ -61,7 +61,9 @@ di **consultazione** delle notifiche pendenti (pull).
 
 - **UC-R1 – Inserire dati iniziali di pazienti e medici**
   Inserisce i dati anagrafici e le credenziali necessarie all'autenticazione di
-  pazienti e medici.
+  pazienti e medici. Gestisce inoltre la relazione paziente–medico: ogni
+  paziente ha esattamente un medico di riferimento e ogni medico può avere da
+  0 a n pazienti. La relazione è persistita in `Backend/data/associations.csv`.
 
 ## Attore: Sistema (azioni automatiche)
 

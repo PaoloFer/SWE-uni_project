@@ -6,3 +6,6 @@ venv/
 .env
 *.egg-info/
 .vscode/
+
+# Test
+Backend/.test_data_backup/

@@ -121,6 +121,32 @@ button:hover {
     background: #22679b;
 }
 
+details {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+details summary {
+    cursor: pointer;
+    display: inline-block;
+    background: #2c7fb8;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+details summary:hover {
+    background: #22679b;
+}
+
+.cell-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 .chart-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;

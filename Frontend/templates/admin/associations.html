@@ -1,0 +1,64 @@
+{% extends "admin/base.html" %}
+{% block title %}Associazioni - Amministrazione{% endblock %}
+
+{% block content %}
+    <h2>Associazione pazienti - medici</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+                {% for category, message in messages %}
+                    <li class="{{ 'error' if category == 'error' else '' }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <h3>Assegna / modifica medico di riferimento</h3>
+    <form method="post" action="{{ url_for('admin.assign_doctor') }}">
+        <label>
+            Paziente
+            <select name="patient_id" required>
+                {% for p in patients %}
+                    <option value="{{ p.id }}">{{ p.name }} {{ p.surname }} (ID {{ p.id }})</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>
+            Medico di riferimento
+            <select name="doctor_id">
+                <option value="">— nessuno —</option>
+                {% for d in doctors %}
+                    <option value="{{ d.id }}">{{ d.name }} {{ d.surname }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <button type="submit">Salva associazione</button>
+    </form>
+
+    <h3>Associazioni attive</h3>
+    {% if associations %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Paziente</th>
+                    <th>ID paziente</th>
+                    <th>Medico</th>
+                    <th>ID medico</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in associations %}
+                    <tr>
+                        <td>{{ a.patient_name }}</td>
+                        <td>{{ a.patient_id }}</td>
+                        <td>{{ a.doctor_name }}</td>
+                        <td>{{ a.doctor_id }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nessuna associazione attiva.</p>
+    {% endif %}
+{% endblock %}

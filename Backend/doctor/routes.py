@@ -17,7 +17,19 @@ def _current_doctor() -> str:
 
 def _list_patients():
     manager = CsvManager("./data/patient.csv", delimiter=";")
-    return manager.read()
+    patients = manager.read()
+    associations = CsvManager("./data/associations.csv", delimiter=";")
+    doctors = CsvManager("./data/doctors.csv", delimiter=";")
+    assoc_map = {a["patient_id"]: a["doctor_id"] for a in associations.read()}
+    doctor_map = {
+        d["id"]: f"{d['name']} {d['surname']}"
+        for d in doctors.read()
+    }
+    for p in patients:
+        doctor_id = assoc_map.get(p["id"], "")
+        p["doctor_id"] = doctor_id
+        p["reference_doctor"] = doctor_map.get(doctor_id, doctor_id)
+    return patients
 
 
 @doctor_bp.route("/")
