@@ -21,8 +21,18 @@ class SystemUseCases:
         ids = [int(r["id"]) for r in rows if r.get("id", "").isdigit()]
         return max(ids) + 1 if ids else 1
 
+    def _duplicate_notification(self, doctor_id, patient_id, ntype, message) -> bool:
+        return bool(self.notifications.find(
+            doctor_id=str(doctor_id),
+            patient_id=str(patient_id),
+            type=ntype,
+            message=message,
+        ))
+
     def _create_notification(self, doctor_id, patient_id, ntype, severity,
-                             message) -> dict:
+                             message) -> dict | None:
+        if self._duplicate_notification(doctor_id, patient_id, ntype, message):
+            return None
         notification = {
             "id": str(self._next_id(self.notifications)),
             "doctor_id": str(doctor_id),
@@ -35,6 +45,14 @@ class SystemUseCases:
         }
         self.notifications.append(notification)
         return notification
+
+    def run_all_checks(self) -> dict:
+        return {
+            "missing": self.check_missing_intakes(),
+            "consistency": self.verify_intake_consistency(),
+            "adherence": self.flag_non_adherence(),
+            "glucose": self.flag_out_of_range_glucose(),
+        }
 
     def _active_therapies(self):
         return [t for t in self.therapies.read() if t.get("active", "0") == "1"]
@@ -84,7 +102,8 @@ class SystemUseCases:
                     f"Paziente {patient_id}: {reminder} {drug} "
                     f"({done_today}/{expected} assunzioni del {reference}).",
                 )
-                created.append(notification)
+                if notification:
+                    created.append(notification)
         return created
 
     # UC-S5: alert al medico per mancata aderenza (> 3 giorni consecutivi)
@@ -113,7 +132,8 @@ class SystemUseCases:
                     f"Paziente {patient_id}: non aderenza al farmaco {drug} "
                     f"da {gap} giorni consecutivi.",
                 )
-                created.append(notification)
+                if notification:
+                    created.append(notification)
         return created
 
     # UC-S6: segnalare glicemie oltre soglia al medico, per gravità
@@ -121,33 +141,54 @@ class SystemUseCases:
         created = []
         rows = self.glicemia.read()
         for row in rows:
-            patient_id = row["patient_id"]
-            try:
-                value = float(row["value"].replace(",", "."))
-            except (ValueError, TypeError):
+            result = self._evaluate_glucose(row)
+            if not result:
                 continue
-            meal = row.get("meal")
-            doctor = self._reference_doctor(patient_id)
+            severity, label = result
+            doctor = self._reference_doctor(row["patient_id"])
             if not doctor:
                 continue
-            if meal == "pre":
-                if value < PRE_MEAL_MIN:
-                    severity, label = "alta", "ipoglicemia pre-pasto"
-                elif value > PRE_MEAL_MAX:
-                    severity, label = self._glucose_severity(value), "iperglicemia pre-pasto"
-                else:
-                    continue
-            else:
-                if value > POST_MEAL_MAX:
-                    severity, label = self._glucose_severity(value), "iperglicemia post-pasto"
-                else:
-                    continue
             notification = self._create_notification(
-                doctor, patient_id, "glicemia", severity,
-                f"Paziente {patient_id}: {label} {value} mg/dL il {row['measured_on']}.",
+                doctor, row["patient_id"], "glicemia", severity,
+                f"Paziente {row['patient_id']}: {label} {row['value']} mg/dL "
+                f"il {row['measured_on']}.",
             )
-            created.append(notification)
+            if notification:
+                created.append(notification)
         return created
+
+    def _evaluate_glucose(self, row) -> tuple[str, str] | None:
+        try:
+            value = float(row["value"].replace(",", "."))
+        except (ValueError, TypeError):
+            return None
+        meal = row.get("meal")
+        if meal == "pre":
+            if value < PRE_MEAL_MIN:
+                return "alta", "ipoglicemia pre-pasto"
+            if value > PRE_MEAL_MAX:
+                return self._glucose_severity(value), "iperglicemia pre-pasto"
+        elif value > POST_MEAL_MAX:
+            return self._glucose_severity(value), "iperglicemia post-pasto"
+        return None
+
+    def alert_glucose(self, patient_id, value, meal, measured_on) -> dict | None:
+        row = {
+            "patient_id": str(patient_id),
+            "value": str(value),
+            "meal": meal,
+            "measured_on": measured_on,
+        }
+        result = self._evaluate_glucose(row)
+        if not result or result[0] != "alta":
+            return None
+        doctor = self._reference_doctor(patient_id)
+        if not doctor:
+            return None
+        return self._create_notification(
+            doctor, patient_id, "glicemia", result[0],
+            f"Paziente {patient_id}: {result[1]} {value} mg/dL il {measured_on}.",
+        )
 
     def _glucose_severity(self, value) -> str:
         return "alta" if value >= 220 else "media"

@@ -20,10 +20,21 @@ app.register_blueprint(patient_bp)
 app.register_blueprint(system_bp)
 
 
+def _start_background_worker() -> None:
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true" or not app.debug:
+        from system.background import SystemBackgroundWorker
+
+        interval = int(os.environ.get("SYSTEM_CHECK_INTERVAL", "30"))
+        worker = SystemBackgroundWorker(interval)
+        worker.start()
+        app.extensions["system_worker"] = worker
+
+
 @app.route("/")
 def hello():
     return redirect(url_for("auth.login"))
 
 
 if __name__ == "__main__":
+    _start_background_worker()
     app.run(debug=True)

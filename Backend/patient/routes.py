@@ -2,10 +2,12 @@ from flask import Blueprint, redirect, render_template, request, session, url_fo
 
 from auth.decorators import login_required, role_required
 from patient.usecases import PatientUseCases
+from system.usecases import SystemUseCases
 
 patient_bp = Blueprint("patient", __name__, url_prefix="/patient")
 
 _usecases = PatientUseCases("./data")
+_system = SystemUseCases("./data")
 
 
 def _current_patient() -> str:
@@ -48,6 +50,12 @@ def glicemia():
             request.form.get("measured_at", ""),
             request.form["meal"],
             request.form["value"],
+        )
+        _system.alert_glucose(
+            patient_id,
+            request.form["value"],
+            request.form["meal"],
+            request.form["measured_on"],
         )
         return redirect(url_for("patient.glicemia"))
     readings = _usecases.glicemia.find(patient_id=patient_id)

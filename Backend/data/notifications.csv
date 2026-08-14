@@ -1,1 +1,10 @@
 id;doctor_id;patient_id;type;severity;message;created_on;read
+1;;1;assunzione;media;Paziente 1: assunzione dimenticata per il farmaco prova (0/5 assunzioni del 2026-08-14).;2026-08-14;0
+2;;1;assunzione;media;Paziente 1: assunzione dimenticata per il farmaco prova (0/3 assunzioni del 2026-08-14).;2026-08-14;0
+3;M1;1;glicemia;media;Paziente 1: iperglicemia post-pasto 190 mg/dL il 2026-08-03.;2026-08-14;0
+4;M1;1;glicemia;media;Paziente 1: iperglicemia pre-pasto 132 mg/dL il 2026-08-05.;2026-08-14;0
+5;M1;1;glicemia;media;Paziente 1: iperglicemia post-pasto 205 mg/dL il 2026-08-05.;2026-08-14;0
+6;M1;1;glicemia;media;Paziente 1: iperglicemia post-pasto 185 mg/dL il 2026-08-14.;2026-08-14;0
+7;M1;1;glicemia;alta;Paziente 1: iperglicemia post-pasto 1000 mg/dL il 2026-08-14.;2026-08-14;0
+8;M1;1;glicemia;alta;Paziente 1: iperglicemia pre-pasto 1000 mg/dL il 2026-08-14.;2026-08-14;0
+9;M1;1;glicemia;alta;Paziente 1: iperglicemia pre-pasto 15000 mg/dL il 2026-08-14.;2026-08-14;0

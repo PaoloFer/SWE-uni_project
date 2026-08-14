@@ -28,16 +28,13 @@ def dashboard():
 @login_required
 @role_required("system")
 def run_checks():
-    missing = _usecases.check_missing_intakes()
-    consistency = _usecases.verify_intake_consistency()
-    adherence = _usecases.flag_non_adherence()
-    glucose = _usecases.flag_out_of_range_glucose()
+    results = _usecases.run_all_checks()
     return render_template(
         "system/checks.html",
-        missing=missing,
-        consistency=consistency,
-        adherence=adherence,
-        glucose=glucose,
+        missing=results["missing"],
+        consistency=results["consistency"],
+        adherence=results["adherence"],
+        glucose=results["glucose"],
         current_username=session.get("username"),
     )
 
