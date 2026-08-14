@@ -1,0 +1,21 @@
+{% extends "doctor/base.html" %}
+{% block title %}Notifiche{% endblock %}
+
+{% block content %}
+    <h2>Notifiche per il diabetologo {{ current_doctor }}</h2>
+
+    {% if notifications %}
+        <ul>
+            {% for n in notifications %}
+                <li>
+                    <strong>{{ n.severity | upper }}</strong> - Paziente {{ n.patient_id }}:
+                    {{ n.message }}
+                    ({{ n.created_on }}) -
+                    <a href="{{ url_for('doctor.mark_read', notification_id=n.id) }}">segna come letta</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nessuna notifica da leggere.</p>
+    {% endif %}
+{% endblock %}

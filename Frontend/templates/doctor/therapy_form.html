@@ -1,0 +1,32 @@
+{% extends "doctor/base.html" %}
+{% block title %}Prescrivi / Modifica terapia{% endblock %}
+
+{% block content %}
+    <h2>{{ "Modifica terapia" if editing else "Nuova terapia" }} per {{ data.name }} {{ data.surname }}</h2>
+
+    <form method="post">
+        {% if editing %}
+            <input type="hidden" name="therapy_id" value="{{ editing.id }}">
+        {% endif %}
+
+        <label>
+            Farmaco
+            <input type="text" name="drug" value="{{ editing.drug if editing else '' }}" required>
+        </label>
+        <label>
+            Assunzioni giornaliere
+            <input type="number" name="daily_frequency" value="{{ editing.daily_frequency if editing else '' }}" min="1" required>
+        </label>
+        <label>
+            Quantità per assunzione
+            <input type="text" name="dose" value="{{ editing.dose if editing else '' }}" placeholder="es. 500mg" required>
+        </label>
+        <label>
+            Indicazioni
+            <input type="text" name="indications" value="{{ editing.indications if editing else '' }}" placeholder="es. dopo i pasti">
+        </label>
+
+        <button type="submit">{{ "Salva modifiche" if editing else "Prescrivi" }}</button>
+        <a class="button" href="{{ url_for('doctor.patient_detail', patient_id=data.patient_id) }}">Annulla</a>
+    </form>
+{% endblock %}

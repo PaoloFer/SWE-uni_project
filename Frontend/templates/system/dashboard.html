@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Area Sistema - Telemedicina{% endblock %}
+{% block header %}Area Sistema{% endblock %}
+
+{% block nav %}
+    <a href="{{ url_for('auth.logout') }}">Esci</a>
+{% endblock %}
+
+{% block content %}
+    <h2>Dashboard responsabile del servizio</h2>
+    <p>Benvenuto, {{ current_username }}.</p>
+    <p>L'inserimento dei dati iniziali di pazienti e medici sarà disponibile qui.</p>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "doctor/base.html" %}
+{% block title %}Informazioni cliniche{% endblock %}
+
+{% block content %}
+    <h2>Informazioni cliniche - {{ data.name }} {{ data.surname }}</h2>
+
+    <form method="post">
+        <label>
+            Fattori di rischio (es. fumatore, ex-fumatore, obesità, dipendenze)
+            <input type="text" name="risk_factors" value="{{ info.risk_factors if info else '' }}">
+        </label>
+        <label>
+            Patologie pregresse
+            <input type="text" name="past_pathologies" value="{{ info.past_pathologies if info else '' }}">
+        </label>
+        <label>
+            Comorbidità presenti (es. ipertensione)
+            <input type="text" name="comorbidities" value="{{ info.comorbidities if info else '' }}">
+        </label>
+
+        <button type="submit">Salva</button>
+        <a class="button" href="{{ url_for('doctor.patient_detail', patient_id=data.patient_id) }}">Annulla</a>
+    </form>
+{% endblock %}

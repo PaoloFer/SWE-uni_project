@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Area Paziente - Telemedicina{% endblock %}
+{% block header %}Area Paziente{% endblock %}
+
+{% block nav %}
+    <a href="{{ url_for('auth.logout') }}">Esci</a>
+{% endblock %}
+
+{% block content %}
+    <h2>Dashboard paziente</h2>
+    <p>Benvenuto, paziente <strong>{{ current_username }}</strong> (ID {{ entity_id }}).</p>
+    <p>Le funzionalità del paziente saranno disponibili qui.</p>
+{% endblock %}

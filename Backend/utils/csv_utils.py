@@ -41,7 +41,7 @@ class CsvManager:
             self.write(rows)
             return
         with open(self.path, "a", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+            writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()), delimiter=self.delimiter)
             writer.writerows(rows)
 
     def find(self, **filters: Any) -> list[dict[str, Any]]:

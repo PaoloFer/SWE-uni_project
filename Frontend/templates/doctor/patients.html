@@ -1,0 +1,34 @@
+{% extends "doctor/base.html" %}
+{% block title %}Pazienti{% endblock %}
+
+{% block content %}
+    <h2>Elenco pazienti</h2>
+    {% if patients %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Cognome</th>
+                    <th>Telefono</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in patients %}
+                    <tr>
+                        <td>{{ p.id }}</td>
+                        <td>{{ p.name }}</td>
+                        <td>{{ p.surname }}</td>
+                        <td>{{ p.phone }}</td>
+                        <td>
+                            <a class="button" href="{{ url_for('doctor.patient_detail', patient_id=p.id) }}">Scheda</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nessun paziente registrato.</p>
+    {% endif %}
+{% endblock %}

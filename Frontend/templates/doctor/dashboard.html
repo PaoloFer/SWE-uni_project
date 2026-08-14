@@ -1,0 +1,25 @@
+{% extends "doctor/base.html" %}
+{% block title %}Dashboard Diabetologo{% endblock %}
+
+{% block content %}
+    <h2>Dashboard</h2>
+    <p>Benvenuto, diabetologo <strong>{{ current_doctor }}</strong>.</p>
+
+    <h3>Notifiche da leggere ({{ notifications | length }})</h3>
+    {% if notifications %}
+        <ul>
+            {% for n in notifications %}
+                <li>
+                    <em>Paziente {{ n.patient_id }}</em> - {{ n.message }}
+                    (gravità: {{ n.severity }}) -
+                    <a href="{{ url_for('doctor.mark_read', notification_id=n.id) }}">segna come letta</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nessuna notifica in attesa.</p>
+    {% endif %}
+
+    <h3>Pazienti ({{ patients | length }})</h3>
+    <a class="button" href="{{ url_for('doctor.patients') }}">Vai all'elenco pazienti</a>
+{% endblock %}

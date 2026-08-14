@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Telemedicina - Diabetologo{% endblock %}
+{% block header %}Diabetologo{% endblock %}
+
+{% block nav %}
+    <a href="{{ url_for('doctor.dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('doctor.patients') }}">Pazienti</a>
+    <a href="{{ url_for('doctor.notifications') }}">Notifiche</a>
+    <a href="{{ url_for('auth.logout') }}">Esci</a>
+{% endblock %}

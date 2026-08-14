@@ -1,0 +1,8 @@
+{% extends "doctor/base.html" %}
+{% block title %}Paziente non trovato{% endblock %}
+
+{% block content %}
+    <h2>Paziente non trovato</h2>
+    <p>Nessun paziente con ID <strong>{{ patient_id }}</strong>.</p>
+    <a class="button" href="{{ url_for('doctor.patients') }}">Torna all'elenco pazienti</a>
+{% endblock %}

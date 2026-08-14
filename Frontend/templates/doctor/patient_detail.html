@@ -1,0 +1,191 @@
+{% extends "doctor/base.html" %}
+{% block title %}Scheda paziente {{ data.name }} {{ data.surname }}{% endblock %}
+
+{% block content %}
+    <h2>Scheda paziente #{{ data.patient_id }}</h2>
+    <p><strong>{{ data.name }} {{ data.surname }}</strong></p>
+
+    <p>
+        <a class="button" href="{{ url_for('doctor.therapy', patient_id=data.patient_id) }}">+ Prescrivi terapia</a>
+        <a class="button" href="{{ url_for('doctor.clinical_info', patient_id=data.patient_id) }}">Info cliniche</a>
+    </p>
+
+    <h3>Andamento glicemia</h3>
+    <div class="chart-toolbar">
+        <label for="period">Periodo</label>
+        <select id="period">
+            <option value="week">Settimana</option>
+            <option value="month">Mese</option>
+        </select>
+    </div>
+    <div class="chart-box">
+        <div class="chart-canvas-wrap">
+            <canvas id="trendChart"></canvas>
+        </div>
+    </div>
+
+    <h3>Terapie prescritte</h3>
+    {% if data.therapies %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Farmaco</th>
+                    <th>Ass. giornaliere</th>
+                    <th>Dose</th>
+                    <th>Indicazioni</th>
+                    <th>Prescritta il</th>
+                    <th>Stato</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in data.therapies %}
+                    <tr>
+                        <td>{{ t.drug }}</td>
+                        <td>{{ t.daily_frequency }}</td>
+                        <td>{{ t.dose }}</td>
+                        <td>{{ t.indications }}</td>
+                        <td>{{ t.prescribed_on }}</td>
+                        <td>{{ "attiva" if t.active == "1" else "non attiva" }}</td>
+                        <td><a href="{{ url_for('doctor.therapy', patient_id=data.patient_id, edit=t.id) }}">Modifica</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nessuna terapia prescritta.</p>
+    {% endif %}
+
+    <h3>Rilevazioni glicemia</h3>
+    {% if data.glicemia %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Momento</th>
+                    <th>Valore (mg/dL)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for g in data.glicemia %}
+                    <tr>
+                        <td>{{ g.measured_on }}</td>
+                        <td>{{ "pre-pasto" if g.meal == "pre" else "post-pasto" }}</td>
+                        <td>{{ g.value }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nessuna rilevazione.</p>
+    {% endif %}
+
+    <h3>Sintomi segnalati</h3>
+    {% if data.symptoms %}
+        <ul>
+            {% for s in data.symptoms %}
+                <li>{{ s.reported_on }} - {{ s.symptom }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nessun sintomo segnalato.</p>
+    {% endif %}
+
+    <h3>Informazioni cliniche</h3>
+    {% if data.clinical_info %}
+        {% for i in data.clinical_info %}
+            <dl>
+                <dt>Fattori di rischio</dt>
+                <dd>{{ i.risk_factors }}</dd>
+                <dt>Patologie pregresse</dt>
+                <dd>{{ i.past_pathologies }}</dd>
+                <dt>Comorbidità</dt>
+                <dd>{{ i.comorbidities }}</dd>
+                <dt>Ultimo aggiornamento</dt>
+                <dd>{{ i.updated_on }} (di {{ i.updated_by }})</dd>
+            </dl>
+        {% endfor %}
+    {% else %}
+        <p>Nessuna informazione clinica.</p>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        const patientId = {{ data.patient_id | tojson }};
+        const trendUrl = {{ url_for('doctor.patient_trend', patient_id=data.patient_id) | tojson }};
+
+        let trendChart = null;
+
+        function makeChart(data) {
+            const ctx = document.getElementById('trendChart');
+            if (trendChart) trendChart.destroy();
+            if (!data.length) {
+                ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+                return;
+            }
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.period),
+                    datasets: [
+                        {
+                            label: 'Media glicemia',
+                            data: data.map(d => d.avg),
+                            borderColor: '#2c7fb8',
+                            backgroundColor: 'rgba(44,127,184,0.15)',
+                            fill: true,
+                        },
+                        {
+                            label: 'Min',
+                            data: data.map(d => d.min),
+                            borderColor: '#8ab82c',
+                            borderDash: [5, 5],
+                            fill: false,
+                        },
+                        {
+                            label: 'Max',
+                            data: data.map(d => d.max),
+                            borderColor: '#d9534f',
+                            borderDash: [5, 5],
+                            fill: false,
+                        },
+                        {
+                            label: 'Soglia pre-pasto alta (130)',
+                            data: data.map(() => 130),
+                            borderColor: '#c99a00',
+                            borderDash: [2, 2],
+                            fill: false,
+                        },
+                        {
+                            label: 'Soglia post-pasto (180)',
+                            data: data.map(() => 180),
+                            borderColor: '#a00',
+                            borderDash: [2, 2],
+                            fill: false,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 16, font: { size: 11 } } },
+                    },
+                },
+            });
+        }
+
+        async function loadTrend(period) {
+            const res = await fetch(trendUrl + '?period=' + period);
+            const data = await res.json();
+            makeChart(data);
+        }
+
+        document.getElementById('period').addEventListener('change', (e) => {
+            loadTrend(e.target.value);
+        });
+
+        loadTrend('week');
+    </script>
+{% endblock %}
