@@ -64,54 +64,54 @@ def check(label, cond):
 
 
 try:
-    # 1. Login admin
+    # 1. Login dell'admin
     r = client.post("/auth/login", data={"username": "admin", "password": "admin"})
     check("login admin", r.status_code == 302 and "/system/" in r.headers.get("Location", ""))
 
-    # 2. Admin pages load
+    # 2. Le pagine dell'admin si caricano
     for url in ["/admin/", "/admin/patients", "/admin/doctors", "/admin/associations"]:
         r = client.get(url)
         check(f"GET {url}", r.status_code == 200)
 
-    # 3. Create a doctor
+    # 3. Crea un medico
     r = client.post("/admin/doctors/create", data={
         "name": "Anna", "surname": "Bianchi", "email": "anna@example.com",
         "username": "abianchi", "password": "secret",
     })
     check("create doctor -> redirect", r.status_code == 302)
 
-    # 4. Create a patient assigned to new doctor
+    # 4. Crea un paziente assegnato al nuovo medico
     r = client.post("/admin/patients/create", data={
         "name": "Luca", "surname": "Verdi", "phone": "333", "doctor_id": "M2",
         "username": "lverdi", "password": "secret",
     })
     check("create patient -> redirect", r.status_code == 302)
 
-    # 5. Check associations page lists the new pair
+    # 5. Verifica che la pagina associazioni mostri la nuova coppia
     r = client.get("/admin/associations")
     body = r.get_data(as_text=True)
     check("associations page shows pair", "Luca Verdi" in body and "Anna Bianchi" in body)
 
-    # 6. Login as new patient
+    # 6. Login del nuovo paziente
     client.get("/auth/logout")
     r = client.post("/auth/login", data={"username": "lverdi", "password": "secret"})
     check("login new patient", r.status_code == 302 and "/patient/" in r.headers.get("Location", ""))
 
-    # 7. Patient dashboard shows reference doctor
+    # 7. La dashboard del paziente mostra il medico di riferimento
     r = client.get("/patient/")
     body = r.get_data(as_text=True)
     check("patient dashboard shows doctor", "Anna Bianchi" in body)
 
-    # 8. Patient contact page shows email
+    # 8. La pagina di contatto del paziente mostra l'email
     r = client.get("/patient/contatto-medico")
     body = r.get_data(as_text=True)
     check("patient contact shows email", "anna@example.com" in body)
 
-    # 9. Patient sends contact -> creates notification for doctor
+    # 9. Il paziente invia un contatto -> crea una notifica per il medico
     r = client.post("/patient/contatto-medico", data={"message": "Ho una domanda"})
     check("patient contact post -> redirect", r.status_code == 302)
 
-    # 10. Login as doctor M2 and see notification
+    # 10. Login del medico M2 e visualizzazione della notifica
     client.get("/auth/logout")
     r = client.post("/auth/login", data={"username": "abianchi", "password": "secret"})
     check("login doctor M2", r.status_code == 302 and "/doctor/" in r.headers.get("Location", ""))
@@ -119,26 +119,26 @@ try:
     payload = r.get_json() or []
     check("doctor sees contact notification", any("Ho una domanda" in n.get("message", "") for n in payload))
 
-    # 10b. Doctor patient detail shows assunzioni/concomitanti sections
+    # 10b. Il dettaglio del paziente del medico mostra le sezioni assunzioni/concomitanti
     r = client.get("/doctor/patients/2")
     body = r.get_data(as_text=True)
     check("doctor patient detail has assunzioni section", "Assunzioni registrate dal paziente" in body)
     check("doctor patient detail has concomitant section", "Segnalazioni concomitanti" in body)
 
-    # 11. Doctor patients list shows only own patients
+    # 11. L'elenco dei pazienti del medico mostra solo i suoi pazienti
     r = client.get("/doctor/patients")
     body = r.get_data(as_text=True)
     check("doctor patients list has own patient", "Verdi" in body and "Luca" in body)
     check("doctor patients list has reference", "Anna Bianchi" in body)
     check("doctor patients list excludes other doctor's patient", "Giacomi" not in body)
 
-    # 11b. Doctor cannot open another doctor's patient detail
+    # 11b. Il medico non può aprire il dettaglio di un paziente di un altro medico
     r = client.get("/doctor/patients/1")
     check("doctor blocked from other doctor's patient", r.status_code == 404)
     r = client.get("/doctor/patients/1/trend")
     check("doctor blocked from other doctor's patient trend", r.status_code == 404)
 
-    # 12. Update doctor password via admin
+    # 12. Aggiorna la password del medico tramite admin
     client.get("/auth/logout")
     client.post("/auth/login", data={"username": "admin", "password": "admin"})
     r = client.post("/admin/doctors/M2/edit", data={
@@ -150,7 +150,7 @@ try:
     r = client.post("/auth/login", data={"username": "abianchi", "password": "nuova"})
     check("login with new password", r.status_code == 302)
 
-    # 13. Admin delete patient
+    # 13. L'admin elimina un paziente
     client.get("/auth/logout")
     client.post("/auth/login", data={"username": "admin", "password": "admin"})
     r = client.post("/admin/patients/2/delete")
@@ -159,17 +159,17 @@ try:
     r = client.post("/auth/login", data={"username": "lverdi", "password": "secret"})
     check("deleted patient can't login", r.status_code == 401)
 
-    # 14. Admin delete doctor
+    # 14. L'admin elimina un medico
     client.post("/auth/login", data={"username": "admin", "password": "admin"})
     r = client.post("/admin/doctors/M2/delete")
     check("delete doctor -> redirect", r.status_code == 302)
 
-    # 15. system usecase reference doctor from associations (patient 1 -> M1)
+    # 15. Use case di sistema: medico di riferimento dalle associazioni (paziente 1 -> M1)
     from system.usecases import SystemUseCases
     su = SystemUseCases(TEST_DATA)
     check("reference doctor patient 1 = M1", su._reference_doctor("1") == "M1")
 
-    # 16. UC-S2: quantity above prescribed dose is flagged
+    # 16. UC-S2: viene segnalata una quantità superiore alla dose prescritta
     from utils.csv_utils import CsvManager
     assunzioni = CsvManager(f"{TEST_DATA}/assunzioni.csv", delimiter=";")
     assunzioni.append({
@@ -179,7 +179,7 @@ try:
     issues = su.verify_intake_consistency()
     check("UC-S2 flags quantity above dose", any("quantità" in i["issue"] and "superiore" in i["issue"] for i in issues))
 
-    # 17. UC-S2: daily frequency exceeded is flagged (therapy prova freq 5, record 6 intakes)
+    # 17. UC-S2: viene segnalata la frequenza giornaliera superata (terapia prova freq 5, registrate 6 assunzioni)
     for _ in range(6):
         assunzioni.append({
             "patient_id": "1", "assumed_on": "2026-08-13", "assumed_at": "",
