@@ -26,11 +26,13 @@ def _dashboard_data(patient_id):
 @login_required
 @role_required("patient")
 def dashboard():
+    notifications = _usecases.view_notifications(_current_patient())
     return render_template(
         "patient/dashboard.html",
         current_username=session.get("username"),
         entity_id=_current_patient(),
         data=_dashboard_data(_current_patient()),
+        notifications=notifications,
     )
 
 
@@ -145,6 +147,27 @@ def contact():
         entity_id=patient_id,
         contacts=contacts,
     )
+
+
+@patient_bp.route("/notifications")
+@login_required
+@role_required("patient")
+def notifications():
+    rows = _usecases.view_notifications(_current_patient())
+    return render_template(
+        "patient/notifications.html",
+        notifications=rows,
+        current_username=session.get("username"),
+        entity_id=_current_patient(),
+    )
+
+
+@patient_bp.route("/notifications/<notification_id>/read")
+@login_required
+@role_required("patient")
+def mark_read(notification_id):
+    _usecases.mark_notification_read(notification_id, _current_patient())
+    return redirect(url_for("patient.notifications"))
 
 
 @patient_bp.route("/logout")

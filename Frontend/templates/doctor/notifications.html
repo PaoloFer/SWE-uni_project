@@ -3,19 +3,78 @@
 
 {% block content %}
     <h2>Notifiche per il diabetologo {{ current_doctor }}</h2>
+    <p class="muted">Aggiornate automaticamente ogni 15 secondi.</p>
 
-    {% if notifications %}
-        <ul>
-            {% for n in notifications %}
-                <li>
-                    <strong>{{ n.severity | upper }}</strong> - Paziente {{ n.patient_id }}:
-                    {{ n.message }}
-                    ({{ n.created_on }}) -
-                    <a href="{{ url_for('doctor.mark_read', notification_id=n.id) }}">segna come letta</a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>Nessuna notifica da leggere.</p>
-    {% endif %}
+    <div class="chart-toolbar">
+        <label for="filter">Filtra per gravità</label>
+        <select id="filter">
+            <option value="all">Tutte</option>
+            <option value="alta">Alta</option>
+            <option value="media">Media</option>
+        </select>
+    </div>
+
+    <table id="notifications-table">
+        <thead>
+            <tr>
+                <th>Severità</th>
+                <th>Tipo</th>
+                <th>Paziente</th>
+                <th>Messaggio</th>
+                <th>Data</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <p id="empty" class="muted" hidden>Nessuna notifica da leggere.</p>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        const apiUrl = {{ url_for('doctor.notifications_api') | tojson }};
+        const readUrl = {{ url_for('doctor.mark_read', notification_id='__ID__') | tojson }};
+        let currentFilter = 'all';
+
+        const typeLabels = {
+            glicemia: 'glicemia fuori soglia',
+            aderenza: 'non aderenza',
+            assunzione: 'assunzione',
+        };
+
+        async function loadNotifications() {
+            const res = await fetch(apiUrl);
+            const rows = await res.json();
+            render(rows);
+        }
+
+        function render(rows) {
+            const tbody = document.querySelector('#notifications-table tbody');
+            const empty = document.getElementById('empty');
+            tbody.innerHTML = '';
+            const filtered = currentFilter === 'all'
+                ? rows
+                : rows.filter(r => r.severity === currentFilter);
+            empty.hidden = filtered.length > 0;
+            for (const n of filtered) {
+                const tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td class="sev sev-' + n.severity + '">' + n.severity + '</td>' +
+                    '<td>' + (typeLabels[n.type] || n.type) + '</td>' +
+                    '<td>' + n.patient_id + '</td>' +
+                    '<td>' + n.message + '</td>' +
+                    '<td>' + n.created_on + '</td>' +
+                    '<td><a href="' + readUrl.replace('__ID__', n.id) + '">segna come letta</a></td>';
+                tbody.appendChild(tr);
+            }
+        }
+
+        document.getElementById('filter').addEventListener('change', (e) => {
+            currentFilter = e.target.value;
+            loadNotifications();
+        });
+
+        loadNotifications();
+        setInterval(loadNotifications, 15000);
+    </script>
 {% endblock %}

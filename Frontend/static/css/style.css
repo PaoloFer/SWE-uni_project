@@ -169,3 +169,19 @@ dl dd {
     padding: 10px;
     border-radius: 4px;
 }
+
+.muted {
+    color: #777;
+}
+
+.sev {
+    font-weight: 600;
+}
+
+.sev-alta {
+    color: #d9534f;
+}
+
+.sev-media {
+    color: #c99a00;
+}

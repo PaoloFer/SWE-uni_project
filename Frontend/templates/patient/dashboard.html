@@ -13,6 +13,22 @@
         <a class="button" href="{{ url_for('patient.contact') }}">Contatta il medico</a>
     </p>
 
+    <h3>Notifiche da leggere ({{ notifications | length }})</h3>
+    {% if notifications %}
+        <ul>
+            {% for n in notifications %}
+                <li>
+                    <strong>{{ n.severity | upper }}</strong> - {{ n.message }}
+                    ({{ n.created_on }}) -
+                    <a href="{{ url_for('patient.mark_read', notification_id=n.id) }}">segna come letta</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <a class="button" href="{{ url_for('patient.notifications') }}">Vai a tutte le notifiche</a>
+    {% else %}
+        <p>Nessuna notifica in attesa.</p>
+    {% endif %}
+
     <h3>Terapie prescritte</h3>
     {% if data.therapies %}
         <table>
