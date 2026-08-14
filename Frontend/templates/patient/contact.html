@@ -1,0 +1,26 @@
+{% extends "patient/base.html" %}
+{% block title %}Contatta il medico{% endblock %}
+
+{% block content %}
+    <h2>Contattare il medico di riferimento</h2>
+    <p>Invia una richiesta o una domanda al tuo medico di riferimento.</p>
+
+    <form method="post" action="{{ url_for('patient.contact') }}">
+        <label>
+            Messaggio
+            <textarea name="message" rows="5" placeholder="Scrivi qui la tua richiesta..." required></textarea>
+        </label>
+        <button type="submit">Invia</button>
+    </form>
+
+    <h3>Messaggi inviati</h3>
+    {% if contacts %}
+        <ul>
+            {% for c in contacts %}
+                <li><strong>{{ c.created_on }}</strong> - {{ c.message }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nessun messaggio inviato.</p>
+    {% endif %}
+{% endblock %}

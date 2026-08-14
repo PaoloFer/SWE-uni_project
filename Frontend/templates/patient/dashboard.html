@@ -1,19 +1,19 @@
-{% extends "base.html" %}
-
-{% block title %}Area Paziente - Telemedicina{% endblock %}
-{% block header %}Area Paziente{% endblock %}
-
-{% block nav %}
-    <a href="{{ url_for('patient.dashboard') }}">Dashboard</a>
-    <a href="{{ url_for('patient.notifications') }}">Notifiche ({{ notifications | length }})</a>
-    <a href="{{ url_for('auth.logout') }}">Esci</a>
-{% endblock %}
+{% extends "patient/base.html" %}
+{% block title %}Dashboard paziente{% endblock %}
 
 {% block content %}
     <h2>Dashboard paziente</h2>
-    <p>Benvenuto, paziente <strong>{{ current_username }}</strong> (ID {{ entity_id }}).</p>
+    <p>Benvenuto, <strong>{{ current_username }}</strong> (ID {{ entity_id }}).</p>
 
-    <h3>Eventi di sistema da leggere ({{ notifications | length }})</h3>
+    <p>
+        <a class="button" href="{{ url_for('patient.glicemia') }}">+ Inserisci glicemia</a>
+        <a class="button" href="{{ url_for('patient.symptoms') }}">+ Aggiungi sintomo</a>
+        <a class="button" href="{{ url_for('patient.assunzioni') }}">+ Registra assunzione</a>
+        <a class="button" href="{{ url_for('patient.concomitant') }}">+ Segnala concomitanti</a>
+        <a class="button" href="{{ url_for('patient.contact') }}">Contatta il medico</a>
+    </p>
+
+    <h3>Notifiche da leggere ({{ notifications | length }})</h3>
     {% if notifications %}
         <ul>
             {% for n in notifications %}
@@ -24,7 +24,71 @@
                 </li>
             {% endfor %}
         </ul>
+        <a class="button" href="{{ url_for('patient.notifications') }}">Vai a tutte le notifiche</a>
     {% else %}
-        <p>Nessun evento in attesa.</p>
+        <p>Nessuna notifica in attesa.</p>
+    {% endif %}
+
+    <h3>Terapie prescritte</h3>
+    {% if data.therapies %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Farmaco</th>
+                    <th>Ass. giornaliere</th>
+                    <th>Dose</th>
+                    <th>Indicazioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in data.therapies %}
+                    <tr>
+                        <td>{{ t.drug }}</td>
+                        <td>{{ t.daily_frequency }}</td>
+                        <td>{{ t.dose }}</td>
+                        <td>{{ t.indications }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nessuna terapia prescritta.</p>
+    {% endif %}
+
+    <h3>Ultime rilevazioni glicemia</h3>
+    {% if data.glicemia %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Ora</th>
+                    <th>Momento</th>
+                    <th>Valore (mg/dL)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for g in data.glicemia | reverse %}
+                    <tr>
+                        <td>{{ g.measured_on }}</td>
+                        <td>{{ g.measured_at or '-' }}</td>
+                        <td>{{ "pre-pasto" if g.meal == "pre" else "post-pasto" }}</td>
+                        <td>{{ g.value }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nessuna rilevazione registrata.</p>
+    {% endif %}
+
+    <h3>Ultimi sintomi segnalati</h3>
+    {% if data.symptoms %}
+        <ul>
+            {% for s in data.symptoms | reverse %}
+                <li>{{ s.reported_on }} - {{ s.symptom }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nessun sintomo segnalato.</p>
     {% endif %}
 {% endblock %}

@@ -1,0 +1,29 @@
+{% extends "patient/base.html" %}
+{% block title %}Aggiungi sintomo{% endblock %}
+
+{% block content %}
+    <h2>Aggiungere sintomo</h2>
+
+    <form method="post" action="{{ url_for('patient.symptoms') }}">
+        <label>
+            Data
+            <input type="date" name="reported_on" required>
+        </label>
+        <label>
+            Sintomo
+            <input type="text" name="symptom" placeholder="es. spossatezza, nausea, mal di testa" required>
+        </label>
+        <button type="submit">Salva</button>
+    </form>
+
+    <h3>Sintomi segnalati</h3>
+    {% if symptoms %}
+        <ul>
+            {% for s in symptoms %}
+                <li>{{ s.reported_on }} - {{ s.symptom }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nessun sintomo segnalato.</p>
+    {% endif %}
+{% endblock %}
