@@ -2,11 +2,13 @@ from flask import Blueprint, jsonify, redirect, render_template, request, sessio
 
 from auth.decorators import login_required, role_required
 from doctor.usecases import DoctorUseCases
+from system.usecases import SystemUseCases
 from utils.csv_utils import CsvManager
 
 doctor_bp = Blueprint("doctor", __name__, url_prefix="/doctor")
 
 _usecases = DoctorUseCases("./data")
+_system = SystemUseCases("./data")
 
 
 def _current_doctor() -> str:
@@ -93,9 +95,17 @@ def therapy(patient_id):
                 _current_doctor(), therapy_id, drug=drug, daily_frequency=daily_frequency,
                 dose=dose, indications=indications,
             )
+            _system.log_operation(
+                _current_doctor(), "modifica_terapia",
+                f"terapia {therapy_id} paziente {patient_id}",
+            )
         else:
             _usecases.prescribe_therapy(
                 _current_doctor(), patient_id, drug, daily_frequency, dose, indications,
+            )
+            _system.log_operation(
+                _current_doctor(), "prescrizione_terapia",
+                f"paziente {patient_id} farmaco {drug}",
             )
         return redirect(url_for("doctor.patient_detail", patient_id=patient_id))
 
@@ -134,6 +144,9 @@ def clinical_info(patient_id):
             past_pathologies=request.form.get("past_pathologies", ""),
             comorbidities=request.form.get("comorbidities", ""),
         )
+        _system.log_operation(
+            _current_doctor(), "aggiorna_info_cliniche", f"paziente {patient_id}",
+        )
         return redirect(url_for("doctor.patient_detail", patient_id=patient_id))
 
     info = _usecases.view_patient_info(patient_id)
@@ -155,6 +168,14 @@ def notifications():
         notifications=rows,
         current_doctor=_current_doctor(),
     )
+
+
+@doctor_bp.route("/notifications/api")
+@login_required
+@role_required("doctor")
+def notifications_api():
+    rows = _usecases.view_notifications(_current_doctor())
+    return jsonify(rows)
 
 
 @doctor_bp.route("/notifications/<notification_id>/read")

@@ -1,0 +1,33 @@
+{% extends "system/dashboard.html" %}
+
+{% block title %}Operazioni medici - Telemedicina{% endblock %}
+
+{% block content %}
+    <h2>Registro operazioni dei medici (UC-S7)</h2>
+    <a class="button" href="{{ url_for('system.dashboard') }}">← Torna alla dashboard</a>
+
+    {% if operations %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Operazione</th>
+                    <th>Medico</th>
+                    <th>Dettagli</th>
+                    <th>Eseguita il</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for op in operations %}
+                    <tr>
+                        <td>{{ op.operation }}</td>
+                        <td>{{ op.doctor_id }}</td>
+                        <td>{{ op.details }}</td>
+                        <td>{{ op.executed_on }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nessuna operazione registrata finora.</p>
+    {% endif %}
+{% endblock %}

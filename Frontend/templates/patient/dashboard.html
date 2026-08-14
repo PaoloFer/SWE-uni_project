@@ -4,11 +4,27 @@
 {% block header %}Area Paziente{% endblock %}
 
 {% block nav %}
+    <a href="{{ url_for('patient.dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('patient.notifications') }}">Notifiche ({{ notifications | length }})</a>
     <a href="{{ url_for('auth.logout') }}">Esci</a>
 {% endblock %}
 
 {% block content %}
     <h2>Dashboard paziente</h2>
     <p>Benvenuto, paziente <strong>{{ current_username }}</strong> (ID {{ entity_id }}).</p>
-    <p>Le funzionalità del paziente saranno disponibili qui.</p>
+
+    <h3>Eventi di sistema da leggere ({{ notifications | length }})</h3>
+    {% if notifications %}
+        <ul>
+            {% for n in notifications %}
+                <li>
+                    <strong>{{ n.severity | upper }}</strong> - {{ n.message }}
+                    ({{ n.created_on }}) -
+                    <a href="{{ url_for('patient.mark_read', notification_id=n.id) }}">segna come letta</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Nessun evento in attesa.</p>
+    {% endif %}
 {% endblock %}
