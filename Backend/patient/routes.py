@@ -1,9 +1,10 @@
-from flask import Blueprint, redirect, render_template, request, session, url_for
+from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
 import config
 from auth.decorators import login_required, role_required
 from patient.usecases import PatientUseCases
 from system.usecases import SystemUseCases
+from utils.validation import FormValidator
 
 patient_bp = Blueprint("patient", __name__, url_prefix="/patient")
 
@@ -45,28 +46,32 @@ def dashboard():
 @role_required("patient")
 def glicemia():
     patient_id = _current_patient()
-    if request.method == "POST":
-        _usecases.record_glicemia(
-            patient_id,
-            request.form["measured_on"],
-            request.form.get("measured_at", ""),
-            request.form["meal"],
-            request.form["value"],
-        )
-        _system.alert_glucose(
-            patient_id,
-            request.form["value"],
-            request.form["meal"],
-            request.form["measured_on"],
-        )
-        return redirect(url_for("patient.glicemia"))
     readings = _usecases.glicemia.find(patient_id=patient_id)
     readings.reverse()
+
+    form = {}
+    errors = {}
+    if request.method == "POST":
+        v = FormValidator(request.form)
+        measured_on = v.datef("measured_on", "Data", not_future=True)
+        measured_at = v.timef("measured_at", "Ora")
+        meal = v.choice("meal", ("pre", "post"), "Momento del pasto")
+        value = v.numberf("value", "Valore (mg/dL)", minv=10, maxv=600)
+        if not v.has_errors():
+            _usecases.record_glicemia(patient_id, measured_on, measured_at, meal, value)
+            _system.alert_glucose(patient_id, value, meal, measured_on)
+            flash("Rilevazione di glicemia salvata correttamente.", "success")
+            return redirect(url_for("patient.glicemia"))
+        form = {k: request.form.get(k, "") for k in ("measured_on", "measured_at", "meal", "value")}
+        errors = v.errors
+
     return render_template(
         "patient/glicemia.html",
         current_username=session.get("username"),
         entity_id=patient_id,
         readings=readings,
+        form=form,
+        errors=errors,
     )
 
 
@@ -75,20 +80,29 @@ def glicemia():
 @role_required("patient")
 def symptoms():
     patient_id = _current_patient()
-    if request.method == "POST":
-        _usecases.add_symptom(
-            patient_id,
-            request.form["reported_on"],
-            request.form["symptom"],
-        )
-        return redirect(url_for("patient.symptoms"))
     symptoms = _usecases.symptoms.find(patient_id=patient_id)
     symptoms.reverse()
+
+    form = {}
+    errors = {}
+    if request.method == "POST":
+        v = FormValidator(request.form)
+        reported_on = v.datef("reported_on", "Data", not_future=True)
+        symptom = v.required("symptom", "Sintomo", max_len=200)
+        if not v.has_errors():
+            _usecases.add_symptom(patient_id, reported_on, symptom)
+            flash("Sintomo segnalato correttamente.", "success")
+            return redirect(url_for("patient.symptoms"))
+        form = {k: request.form.get(k, "") for k in ("reported_on", "symptom")}
+        errors = v.errors
+
     return render_template(
         "patient/symptoms.html",
         current_username=session.get("username"),
         entity_id=patient_id,
         symptoms=symptoms,
+        form=form,
+        errors=errors,
     )
 
 
@@ -97,17 +111,24 @@ def symptoms():
 @role_required("patient")
 def assunzioni():
     patient_id = _current_patient()
-    if request.method == "POST":
-        _usecases.record_assunzione(
-            patient_id,
-            request.form["assumed_on"],
-            request.form.get("assumed_at", ""),
-            request.form["drug"],
-            request.form["quantity"],
-        )
-        return redirect(url_for("patient.assunzioni"))
     assunzioni = _usecases.assunzioni.find(patient_id=patient_id)
     assunzioni.reverse()
+
+    form = {}
+    errors = {}
+    if request.method == "POST":
+        v = FormValidator(request.form)
+        assumed_on = v.datef("assumed_on", "Data", not_future=True)
+        assumed_at = v.timef("assumed_at", "Ora")
+        drug = v.required("drug", "Farmaco", max_len=120)
+        quantity = v.required("quantity", "Quantità", max_len=60)
+        if not v.has_errors():
+            _usecases.record_assunzione(patient_id, assumed_on, assumed_at, drug, quantity)
+            flash("Assunzione registrata correttamente.", "success")
+            return redirect(url_for("patient.assunzioni"))
+        form = {k: request.form.get(k, "") for k in ("assumed_on", "assumed_at", "drug", "quantity")}
+        errors = v.errors
+
     therapies = _usecases.list_therapies(patient_id)
     return render_template(
         "patient/assunzioni.html",
@@ -115,6 +136,8 @@ def assunzioni():
         entity_id=patient_id,
         assunzioni=assunzioni,
         therapies=therapies,
+        form=form,
+        errors=errors,
     )
 
 
@@ -123,21 +146,30 @@ def assunzioni():
 @role_required("patient")
 def concomitant():
     patient_id = _current_patient()
-    if request.method == "POST":
-        _usecases.report_concomitant(
-            patient_id,
-            request.form["type"],
-            request.form["description"],
-            request.form.get("period", ""),
-        )
-        return redirect(url_for("patient.concomitant"))
     entries = _usecases.concomitant.find(patient_id=patient_id)
     entries.reverse()
+
+    form = {}
+    errors = {}
+    if request.method == "POST":
+        v = FormValidator(request.form)
+        ctype = v.choice("type", ("sintomo", "patologia", "terapia"), "Tipo")
+        description = v.required("description", "Descrizione", max_len=250)
+        period = v.optional("period", "Periodo associato", max_len=60)
+        if not v.has_errors():
+            _usecases.report_concomitant(patient_id, ctype, description, period)
+            flash("Segnalazione registrata correttamente.", "success")
+            return redirect(url_for("patient.concomitant"))
+        form = {k: request.form.get(k, "") for k in ("type", "description", "period")}
+        errors = v.errors
+
     return render_template(
         "patient/concomitant.html",
         current_username=session.get("username"),
         entity_id=patient_id,
         entries=entries,
+        form=form,
+        errors=errors,
     )
 
 
@@ -146,17 +178,29 @@ def concomitant():
 @role_required("patient")
 def contact():
     patient_id = _current_patient()
-    if request.method == "POST":
-        _usecases.contact_doctor(patient_id, request.form["message"])
-        return redirect(url_for("patient.contact"))
     contacts = _usecases.contacts.find(patient_id=patient_id)
     contacts.reverse()
+
+    form = {}
+    errors = {}
+    if request.method == "POST":
+        v = FormValidator(request.form)
+        message = v.required("message", "Messaggio", max_len=1000)
+        if not v.has_errors():
+            _usecases.contact_doctor(patient_id, message)
+            flash("Messaggio inviato correttamente al medico.", "success")
+            return redirect(url_for("patient.contact"))
+        form = {k: request.form.get(k, "") for k in ("message",)}
+        errors = v.errors
+
     return render_template(
         "patient/contact.html",
         current_username=session.get("username"),
         entity_id=patient_id,
         contacts=contacts,
         reference_doctor=_usecases.view_reference_doctor(patient_id),
+        form=form,
+        errors=errors,
     )
 
 

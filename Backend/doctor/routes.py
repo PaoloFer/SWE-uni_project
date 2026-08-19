@@ -1,10 +1,11 @@
-from flask import Blueprint, jsonify, redirect, render_template, request, session, url_for
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, session, url_for
 
 import config
 from auth.decorators import login_required, role_required
 from doctor.usecases import DoctorUseCases
 from system.usecases import SystemUseCases
 from utils.csv_utils import CsvManager
+from utils.validation import FormValidator
 
 doctor_bp = Blueprint("doctor", __name__, url_prefix="/doctor")
 
@@ -122,32 +123,6 @@ def therapy(patient_id):
             current_doctor=_current_doctor(),
         ), 404
 
-    if request.method == "POST":
-        therapy_id = request.form.get("therapy_id")
-        drug = request.form["drug"]
-        daily_frequency = request.form["daily_frequency"]
-        dose = request.form["dose"]
-        indications = request.form.get("indications", "")
-
-        if therapy_id:
-            _usecases.modify_therapy(
-                _current_doctor(), therapy_id, drug=drug, daily_frequency=daily_frequency,
-                dose=dose, indications=indications,
-            )
-            _system.log_operation(
-                _current_doctor(), "modifica_terapia",
-                f"terapia {therapy_id} paziente {patient_id}",
-            )
-        else:
-            _usecases.prescribe_therapy(
-                _current_doctor(), patient_id, drug, daily_frequency, dose, indications,
-            )
-            _system.log_operation(
-                _current_doctor(), "prescrizione_terapia",
-                f"paziente {patient_id} farmaco {drug}",
-            )
-        return redirect(url_for("doctor.patient_detail", patient_id=patient_id))
-
     editing_id = request.args.get("edit")
     editing = None
     if editing_id:
@@ -155,11 +130,60 @@ def therapy(patient_id):
             if therapy["id"] == editing_id:
                 editing = therapy
                 break
+
+    form = {}
+    errors = {}
+    if request.method == "POST":
+        v = FormValidator(request.form)
+        therapy_id = v.raw("therapy_id")
+        drug = v.required("drug", "Farmaco", max_len=120)
+        daily_frequency = v.intf("daily_frequency", "Assunzioni giornaliere", minv=1, maxv=24)
+        dose = v.required("dose", "Quantità per assunzione", max_len=60)
+        indications = v.optional("indications", "Indicazioni", max_len=250)
+
+        if therapy_id and not any(
+            t.get("id") == therapy_id for t in data["therapies"]
+        ):
+            v.fail("drug", "La terapia selezionata non appartiene a questo paziente.")
+
+        if not v.has_errors():
+            if therapy_id:
+                _usecases.modify_therapy(
+                    _current_doctor(), therapy_id, drug=drug, daily_frequency=daily_frequency,
+                    dose=dose, indications=indications,
+                )
+                _system.log_operation(
+                    _current_doctor(), "modifica_terapia",
+                    f"terapia {therapy_id} paziente {patient_id}",
+                )
+                flash("Terapia modificata correttamente.", "success")
+            else:
+                _usecases.prescribe_therapy(
+                    _current_doctor(), patient_id, drug, daily_frequency, dose, indications,
+                )
+                _system.log_operation(
+                    _current_doctor(), "prescrizione_terapia",
+                    f"paziente {patient_id} farmaco {drug}",
+                )
+                flash("Terapia prescritta correttamente.", "success")
+            return redirect(url_for("doctor.patient_detail", patient_id=patient_id))
+
+        form = {
+            "therapy_id": therapy_id,
+            "drug": request.form.get("drug", ""),
+            "daily_frequency": request.form.get("daily_frequency", ""),
+            "dose": request.form.get("dose", ""),
+            "indications": request.form.get("indications", ""),
+        }
+        errors = v.errors
+
     return render_template(
         "doctor/therapy_form.html",
         data=data,
         editing=editing,
         current_doctor=_current_doctor(),
+        form=form,
+        errors=errors,
     )
 
 
@@ -181,18 +205,32 @@ def clinical_info(patient_id):
             current_doctor=_current_doctor(),
         ), 404
 
+    form = {}
+    errors = {}
     if request.method == "POST":
-        _usecases.update_patient_info(
-            _current_doctor(),
-            patient_id,
-            risk_factors=request.form.get("risk_factors", ""),
-            past_pathologies=request.form.get("past_pathologies", ""),
-            comorbidities=request.form.get("comorbidities", ""),
-        )
-        _system.log_operation(
-            _current_doctor(), "aggiorna_info_cliniche", f"paziente {patient_id}",
-        )
-        return redirect(url_for("doctor.patient_detail", patient_id=patient_id))
+        v = FormValidator(request.form)
+        risk_factors = v.optional("risk_factors", "Fattori di rischio", max_len=500)
+        past_pathologies = v.optional("past_pathologies", "Patologie pregresse", max_len=500)
+        comorbidities = v.optional("comorbidities", "Comorbidità", max_len=500)
+        if not v.has_errors():
+            _usecases.update_patient_info(
+                _current_doctor(),
+                patient_id,
+                risk_factors=risk_factors,
+                past_pathologies=past_pathologies,
+                comorbidities=comorbidities,
+            )
+            _system.log_operation(
+                _current_doctor(), "aggiorna_info_cliniche", f"paziente {patient_id}",
+            )
+            flash("Informazioni cliniche salvate correttamente.", "success")
+            return redirect(url_for("doctor.patient_detail", patient_id=patient_id))
+        form = {
+            "risk_factors": request.form.get("risk_factors", ""),
+            "past_pathologies": request.form.get("past_pathologies", ""),
+            "comorbidities": request.form.get("comorbidities", ""),
+        }
+        errors = v.errors
 
     info = _usecases.view_patient_info(patient_id)
     return render_template(
@@ -200,6 +238,8 @@ def clinical_info(patient_id):
         data=data,
         info=info,
         current_doctor=_current_doctor(),
+        form=form,
+        errors=errors,
     )
 
 

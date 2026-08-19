@@ -7,22 +7,40 @@
     <form method="post" action="{{ url_for('patient.glicemia') }}">
         <label>
             Data
-            <input type="date" name="measured_on" required>
+            <input type="date" name="measured_on"
+                   value="{{ form.get('measured_on', '') }}"
+                   class="{{ 'input-error' if errors.get('measured_on') else '' }}" required>
+            {% if errors.get('measured_on') %}
+                <span class="field-error">{{ errors['measured_on'][0] }}</span>
+            {% endif %}
         </label>
         <label>
             Ora
-            <input type="time" name="measured_at">
+            <input type="time" name="measured_at"
+                   value="{{ form.get('measured_at', '') }}"
+                   class="{{ 'input-error' if errors.get('measured_at') else '' }}">
+            {% if errors.get('measured_at') %}
+                <span class="field-error">{{ errors['measured_at'][0] }}</span>
+            {% endif %}
         </label>
         <label>
             Momento del pasto
-            <select name="meal" required>
-                <option value="pre">Pre-pasto</option>
-                <option value="post">Post-pasto</option>
+            <select name="meal" class="{{ 'input-error' if errors.get('meal') else '' }}" required>
+                <option value="pre" {{ 'selected' if form.get('meal', '') == 'pre' }}>Pre-pasto</option>
+                <option value="post" {{ 'selected' if form.get('meal', '') == 'post' }}>Post-pasto</option>
             </select>
+            {% if errors.get('meal') %}
+                <span class="field-error">{{ errors['meal'][0] }}</span>
+            {% endif %}
         </label>
         <label>
             Valore (mg/dL)
-            <input type="number" name="value" min="1" step="1" required>
+            <input type="number" name="value" min="1" step="1"
+                   value="{{ form.get('value', '') }}"
+                   class="{{ 'input-error' if errors.get('value') else '' }}" required>
+            {% if errors.get('value') %}
+                <span class="field-error">{{ errors['value'][0] }}</span>
+            {% endif %}
         </label>
         <button type="submit">Salva</button>
     </form>

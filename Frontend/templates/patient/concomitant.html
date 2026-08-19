@@ -7,19 +7,32 @@
     <form method="post" action="{{ url_for('patient.concomitant') }}">
         <label>
             Tipo
-            <select name="type" required>
-                <option value="sintomo">Sintomo</option>
-                <option value="patologia">Patologia</option>
-                <option value="terapia">Terapia concomitante</option>
+            <select name="type" class="{{ 'input-error' if errors.get('type') else '' }}" required>
+                <option value="sintomo" {{ 'selected' if form.get('type', '') == 'sintomo' }}>Sintomo</option>
+                <option value="patologia" {{ 'selected' if form.get('type', '') == 'patologia' }}>Patologia</option>
+                <option value="terapia" {{ 'selected' if form.get('type', '') == 'terapia' }}>Terapia concomitante</option>
             </select>
+            {% if errors.get('type') %}
+                <span class="field-error">{{ errors['type'][0] }}</span>
+            {% endif %}
         </label>
         <label>
             Descrizione
-            <input type="text" name="description" placeholder="es. ipertensione, farmaco X" required>
+            <input type="text" name="description" placeholder="es. ipertensione, farmaco X"
+                   value="{{ form.get('description', '') }}"
+                   class="{{ 'input-error' if errors.get('description') else '' }}" required>
+            {% if errors.get('description') %}
+                <span class="field-error">{{ errors['description'][0] }}</span>
+            {% endif %}
         </label>
         <label>
             Periodo associato
-            <input type="text" name="period" placeholder="es. da giugno 2026, gennaio-marzo 2026">
+            <input type="text" name="period" placeholder="es. da giugno 2026, gennaio-marzo 2026"
+                   value="{{ form.get('period', '') }}"
+                   class="{{ 'input-error' if errors.get('period') else '' }}">
+            {% if errors.get('period') %}
+                <span class="field-error">{{ errors['period'][0] }}</span>
+            {% endif %}
         </label>
         <button type="submit">Salva</button>
     </form>

@@ -7,11 +7,21 @@
     <form method="post" action="{{ url_for('patient.symptoms') }}">
         <label>
             Data
-            <input type="date" name="reported_on" required>
+            <input type="date" name="reported_on"
+                   value="{{ form.get('reported_on', '') }}"
+                   class="{{ 'input-error' if errors.get('reported_on') else '' }}" required>
+            {% if errors.get('reported_on') %}
+                <span class="field-error">{{ errors['reported_on'][0] }}</span>
+            {% endif %}
         </label>
         <label>
             Sintomo
-            <input type="text" name="symptom" placeholder="es. spossatezza, nausea, mal di testa" required>
+            <input type="text" name="symptom" placeholder="es. spossatezza, nausea, mal di testa"
+                   value="{{ form.get('symptom', '') }}"
+                   class="{{ 'input-error' if errors.get('symptom') else '' }}" required>
+            {% if errors.get('symptom') %}
+                <span class="field-error">{{ errors['symptom'][0] }}</span>
+            {% endif %}
         </label>
         <button type="submit">Salva</button>
     </form>

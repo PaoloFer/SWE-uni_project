@@ -6,7 +6,7 @@
     <h2>Esito controlli automatici</h2>
     <a class="button" href="{{ url_for('system.dashboard') }}">← Torna alla dashboard</a>
 
-    <h3>UC-S3/UC-S4 — Assunzioni mancanti / invito a completare ({{ missing | length }})</h3>
+    <h3>Assunzioni mancanti / invito a completare ({{ missing | length }})</h3>
     {% if missing %}
         <table>
             <thead>
@@ -32,7 +32,7 @@
         <p>Nessuna assunzione mancante.</p>
     {% endif %}
 
-    <h3>UC-S2 — Incoerenze assunzioni/terapie ({{ consistency | length }})</h3>
+    <h3>Incoerenze assunzioni/terapie ({{ consistency | length }})</h3>
     {% if consistency %}
         <table>
             <thead>
@@ -54,7 +54,7 @@
         <p>Nessuna incoerenza riscontrata.</p>
     {% endif %}
 
-    <h3>UC-S5 — Non aderenza &gt; 3 giorni ({{ adherence | length }})</h3>
+    <h3>Non aderenza &gt; 3 giorni ({{ adherence | length }})</h3>
     {% if adherence %}
         <table>
             <thead>
@@ -78,7 +78,7 @@
         <p>Nessuna non aderenza.</p>
     {% endif %}
 
-    <h3>UC-S6 — Glicemie oltre soglia ({{ glucose | length }})</h3>
+    <h3>Glicemie oltre soglia ({{ glucose | length }})</h3>
     {% if glucose %}
         <table>
             <thead>

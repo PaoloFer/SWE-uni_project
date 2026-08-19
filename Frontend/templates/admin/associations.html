@@ -4,16 +4,6 @@
 {% block content %}
     <h2>Associazione pazienti - medici</h2>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <ul>
-                {% for category, message in messages %}
-                    <li class="{{ 'error' if category == 'error' else '' }}">{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
-
     <h3>Assegna / modifica medico di riferimento</h3>
     <form method="post" action="{{ url_for('admin.assign_doctor') }}">
         <label>

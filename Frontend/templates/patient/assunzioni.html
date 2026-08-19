@@ -7,15 +7,30 @@
     <form method="post" action="{{ url_for('patient.assunzioni') }}">
         <label>
             Data
-            <input type="date" name="assumed_on" required>
+            <input type="date" name="assumed_on"
+                   value="{{ form.get('assumed_on', '') }}"
+                   class="{{ 'input-error' if errors.get('assumed_on') else '' }}" required>
+            {% if errors.get('assumed_on') %}
+                <span class="field-error">{{ errors['assumed_on'][0] }}</span>
+            {% endif %}
         </label>
         <label>
             Ora
-            <input type="time" name="assumed_at">
+            <input type="time" name="assumed_at"
+                   value="{{ form.get('assumed_at', '') }}"
+                   class="{{ 'input-error' if errors.get('assumed_at') else '' }}">
+            {% if errors.get('assumed_at') %}
+                <span class="field-error">{{ errors['assumed_at'][0] }}</span>
+            {% endif %}
         </label>
         <label>
             Farmaco
-            <input type="text" name="drug" list="drugs" placeholder="es. metformina" required>
+            <input type="text" name="drug" list="drugs" placeholder="es. metformina"
+                   value="{{ form.get('drug', '') }}"
+                   class="{{ 'input-error' if errors.get('drug') else '' }}" required>
+            {% if errors.get('drug') %}
+                <span class="field-error">{{ errors['drug'][0] }}</span>
+            {% endif %}
         </label>
         <datalist id="drugs">
             {% for t in therapies %}
@@ -24,7 +39,12 @@
         </datalist>
         <label>
             Quantità
-            <input type="text" name="quantity" placeholder="es. 1 compressa, 10 UI" required>
+            <input type="text" name="quantity" placeholder="es. 1 compressa, 10 UI"
+                   value="{{ form.get('quantity', '') }}"
+                   class="{{ 'input-error' if errors.get('quantity') else '' }}" required>
+            {% if errors.get('quantity') %}
+                <span class="field-error">{{ errors['quantity'][0] }}</span>
+            {% endif %}
         </label>
         <button type="submit">Salva</button>
     </form>

@@ -7,15 +7,30 @@
     <form method="post">
         <label>
             Fattori di rischio (es. fumatore, ex-fumatore, obesità, dipendenze)
-            <input type="text" name="risk_factors" value="{{ info.risk_factors if info else '' }}">
+            <input type="text" name="risk_factors"
+                   value="{{ form.get('risk_factors', info.risk_factors if info else '') }}"
+                   class="{{ 'input-error' if errors.get('risk_factors') else '' }}">
+            {% if errors.get('risk_factors') %}
+                <span class="field-error">{{ errors['risk_factors'][0] }}</span>
+            {% endif %}
         </label>
         <label>
             Patologie pregresse
-            <input type="text" name="past_pathologies" value="{{ info.past_pathologies if info else '' }}">
+            <input type="text" name="past_pathologies"
+                   value="{{ form.get('past_pathologies', info.past_pathologies if info else '') }}"
+                   class="{{ 'input-error' if errors.get('past_pathologies') else '' }}">
+            {% if errors.get('past_pathologies') %}
+                <span class="field-error">{{ errors['past_pathologies'][0] }}</span>
+            {% endif %}
         </label>
         <label>
             Comorbidità presenti (es. ipertensione)
-            <input type="text" name="comorbidities" value="{{ info.comorbidities if info else '' }}">
+            <input type="text" name="comorbidities"
+                   value="{{ form.get('comorbidities', info.comorbidities if info else '') }}"
+                   class="{{ 'input-error' if errors.get('comorbidities') else '' }}">
+            {% if errors.get('comorbidities') %}
+                <span class="field-error">{{ errors['comorbidities'][0] }}</span>
+            {% endif %}
         </label>
 
         <button type="submit">Salva</button>

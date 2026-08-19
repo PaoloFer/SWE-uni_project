@@ -1,2 +1,8 @@
 patient_id;risk_factors;past_pathologies;comorbidities;updated_by;updated_on
 1;hlklhfkjdshf;adfasdf;akdkfjadsf;M1;2026-08-14
+5;fumatore;appendicectomia 2020;ipertensione;M1;2026-08-19
+6;obesità (BMI 32);;dislipidemia;M1;2026-08-19
+7;ex-fumatore;gastrite;;M1;2026-08-19
+8;;tiroidite di Hashimoto;ipertensione;M2;2026-08-19
+9;fumatore;;;M2;2026-08-19
+10;;pregressa gravidanza con diabete;;M3;2026-08-19

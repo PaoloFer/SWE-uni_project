@@ -22,7 +22,11 @@
     <form method="post" action="{{ url_for('patient.contact') }}">
         <label>
             Messaggio
-            <textarea name="message" rows="5" placeholder="Scrivi qui la tua richiesta..." required></textarea>
+            <textarea name="message" rows="5" placeholder="Scrivi qui la tua richiesta..."
+                      class="{{ 'input-error' if errors.get('message') else '' }}" required>{{ form.get('message', '') }}</textarea>
+            {% if errors.get('message') %}
+                <span class="field-error">{{ errors['message'][0] }}</span>
+            {% endif %}
         </label>
         <button type="submit">Invia</button>
     </form>

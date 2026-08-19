@@ -5,25 +5,49 @@
     <h2>{{ "Modifica terapia" if editing else "Nuova terapia" }} per {{ data.name }} {{ data.surname }}</h2>
 
     <form method="post">
-        {% if editing %}
-            <input type="hidden" name="therapy_id" value="{{ editing.id }}">
+        {% if editing or form.get('therapy_id') %}
+            <input type="hidden" name="therapy_id"
+                   value="{{ form.get('therapy_id', editing.id if editing else '') }}">
         {% endif %}
 
         <label>
             Farmaco
-            <input type="text" name="drug" value="{{ editing.drug if editing else '' }}" required>
+            <input type="text" name="drug"
+                   value="{{ form.get('drug', editing.drug if editing else '') }}"
+                   class="{{ 'input-error' if errors.get('drug') else '' }}" required>
+            {% if errors.get('drug') %}
+                <span class="field-error">{{ errors['drug'][0] }}</span>
+            {% endif %}
         </label>
         <label>
             Assunzioni giornaliere
-            <input type="number" name="daily_frequency" value="{{ editing.daily_frequency if editing else '' }}" min="1" required>
+            <input type="number" name="daily_frequency"
+                   value="{{ form.get('daily_frequency', editing.daily_frequency if editing else '') }}"
+                   min="1"
+                   class="{{ 'input-error' if errors.get('daily_frequency') else '' }}" required>
+            {% if errors.get('daily_frequency') %}
+                <span class="field-error">{{ errors['daily_frequency'][0] }}</span>
+            {% endif %}
         </label>
         <label>
             Quantità per assunzione
-            <input type="text" name="dose" value="{{ editing.dose if editing else '' }}" placeholder="es. 500mg" required>
+            <input type="text" name="dose"
+                   value="{{ form.get('dose', editing.dose if editing else '') }}"
+                   placeholder="es. 500mg"
+                   class="{{ 'input-error' if errors.get('dose') else '' }}" required>
+            {% if errors.get('dose') %}
+                <span class="field-error">{{ errors['dose'][0] }}</span>
+            {% endif %}
         </label>
         <label>
             Indicazioni
-            <input type="text" name="indications" value="{{ editing.indications if editing else '' }}" placeholder="es. dopo i pasti">
+            <input type="text" name="indications"
+                   value="{{ form.get('indications', editing.indications if editing else '') }}"
+                   placeholder="es. dopo i pasti"
+                   class="{{ 'input-error' if errors.get('indications') else '' }}">
+            {% if errors.get('indications') %}
+                <span class="field-error">{{ errors['indications'][0] }}</span>
+            {% endif %}
         </label>
 
         <button type="submit">{{ "Salva modifiche" if editing else "Prescrivi" }}</button>
