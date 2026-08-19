@@ -195,11 +195,20 @@ try:
     ck("P17 paziente bloccato dall'area medico -> redirect login",
        r.status_code == 302 and "/auth/login" in r.headers.get("Location", ""))
 
+    r = client.get("/patient/notifications/api")
+    ck("P18 paziente chiama api notifiche", r.status_code == 200 and isinstance(r.get_json(), list))
+    r = client.post("/patient/notifications/read-all")
+    ck("P19 paziente segna tutte come lette -> JSON ok",
+       r.status_code == 200 and r.get_json().get("ok") is True)
+    ck("P20 pagina notifiche paziente ha filtri",
+       "Tutte" in body(client.get("/patient/notifications")))
+
     # ============ D. MEDICO: UC-M1..M6 ============
     login("abianchi", "nuova")
     b = body(client.get("/doctor/"))
     ck("D1 dashboard mostra nome completo medico",
        "Benvenuto, diabetologo <strong>Anna Bianchi</strong>" in b)
+    ck("D2 menu mostra badge notifiche non lette", "nav-badge" in b)
 
     r = client.post("/doctor/patients/2/therapies", data={
         "drug": "", "daily_frequency": "2", "dose": "500mg", "indications": ""})
@@ -254,10 +263,20 @@ try:
        any("Ho una domanda" in n.get("message", "") for n in payload))
     ck("M17 medico vede alert glicemia alta",
        any("iperglicemia" in n.get("message", "") for n in payload))
+    ck("M17b api notifiche include nome paziente",
+       any("Luca Verdi" == n.get("patient_name", "") for n in payload))
     if payload:
         nid = payload[0]["id"]
         ck("M18 segna notifica come letta -> redirect",
            client.get(f"/doctor/notifications/{nid}/read").status_code == 302)
+        r = client.post(f"/doctor/notifications/{nid}/read")
+        ck("M18b segna come letta via POST -> JSON ok",
+           r.status_code == 200 and r.get_json().get("ok") is True)
+    r = client.post("/doctor/notifications/read-all")
+    ck("M18c segna tutte come lette -> JSON ok",
+       r.status_code == 200 and r.get_json().get("count", 0) >= 1)
+    ck("M18d dopo lettura non restano notifiche non lette",
+       client.get("/doctor/notifications/api").get_json() == [])
 
     b = body(client.get("/doctor/patients"))
     ck("M19 lista pazienti M2 ha i propri pazienti", "Verdi" in b and "Neri" in b)

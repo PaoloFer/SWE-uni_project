@@ -5,72 +5,108 @@
     <h2>Notifiche per il diabetologo {{ doctor_name }}</h2>
     <p class="muted">Aggiornate automaticamente ogni 15 secondi.</p>
 
-    <div class="chart-toolbar">
-        <label for="filter">Filtra per gravità</label>
-        <select id="filter">
-            <option value="all">Tutte</option>
-            <option value="alta">Alta</option>
-            <option value="media">Media</option>
-        </select>
+    <div class="notifications-toolbar">
+        <div class="btn-group">
+            <button data-filter="all" class="button active">Tutte</button>
+            <button data-filter="alta" class="button">Alta</button>
+            <button data-filter="media" class="button">Media</button>
+        </div>
+        <button id="read-all" class="button">Segna tutte come lette</button>
     </div>
 
-    <table id="notifications-table">
-        <thead>
-            <tr>
-                <th>Severità</th>
-                <th>Tipo</th>
-                <th>Paziente</th>
-                <th>Messaggio</th>
-                <th>Data</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <div id="notifications-list" class="notification-list">
+        <p class="muted">Caricamento...</p>
+    </div>
     <p id="empty" class="muted" hidden>Nessuna notifica da leggere.</p>
 {% endblock %}
 
 {% block scripts %}
     <script>
         const apiUrl = {{ url_for('doctor.notifications_api') | tojson }};
-        const readUrl = {{ url_for('doctor.mark_read', notification_id='__ID__') | tojson }};
+        const markUrl = {{ url_for('doctor.mark_read', notification_id='__ID__') | tojson }};
+        const readAllUrl = {{ url_for('doctor.mark_all_read') | tojson }};
         let currentFilter = 'all';
 
         const typeLabels = {
             glicemia: 'glicemia fuori soglia',
             aderenza: 'non aderenza',
-            assunzione: 'assunzione',
+            assunzione: 'assunzione mancante',
+            contact: 'contatto paziente',
         };
 
+        function esc(s) {
+            return String(s).replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+        }
+
+        function card(n) {
+            const sev = n.severity || 'info';
+            const type = typeLabels[n.type] || n.type;
+            const actor = n.patient_name ? 'Paziente ' + n.patient_name : 'Paziente ' + n.patient_id;
+            const btn = sev === 'alta'
+                ? '<button class="button mark-read" data-id="' + n.id + '">Preso in carico</button>'
+                : '<button class="button mark-read" data-id="' + n.id + '">Segna come letta</button>';
+            return '<div class="notification-card sev-' + sev + '">' +
+                '<div class="n-body">' +
+                    '<div class="n-head">' +
+                        '<span class="badge badge-' + sev + '">' + esc(sev) + '</span>' +
+                        '<span class="n-type">' + esc(type) + '</span>' +
+                        '<span class="n-date">' + esc(n.created_on) + '</span>' +
+                    '</div>' +
+                    '<div class="n-actor">' + esc(actor) + '</div>' +
+                    '<div class="n-msg">' + esc(n.message) + '</div>' +
+                '</div>' +
+                '<div class="n-actions">' + btn + '</div>' +
+            '</div>';
+        }
+
         async function loadNotifications() {
-            const res = await fetch(apiUrl);
-            const rows = await res.json();
+            const rows = await (await fetch(apiUrl)).json();
+            refreshBadge(rows);
             render(rows);
         }
 
-        function render(rows) {
-            const tbody = document.querySelector('#notifications-table tbody');
-            const empty = document.getElementById('empty');
-            tbody.innerHTML = '';
-            const filtered = currentFilter === 'all'
-                ? rows
-                : rows.filter(r => r.severity === currentFilter);
-            empty.hidden = filtered.length > 0;
-            for (const n of filtered) {
-                const tr = document.createElement('tr');
-                tr.innerHTML =
-                    '<td class="sev sev-' + n.severity + '">' + n.severity + '</td>' +
-                    '<td>' + (typeLabels[n.type] || n.type) + '</td>' +
-                    '<td>' + n.patient_id + '</td>' +
-                    '<td>' + n.message + '</td>' +
-                    '<td>' + n.created_on + '</td>' +
-                    '<td><a href="' + readUrl.replace('__ID__', n.id) + '">segna come letta</a></td>';
-                tbody.appendChild(tr);
+        function refreshBadge(rows) {
+            const link = document.querySelector('a[href*="notifications"]');
+            const old = document.querySelector('.nav-badge');
+            if (old) old.remove();
+            if (rows.length && link) {
+                const badge = document.createElement('span');
+                badge.className = 'nav-badge';
+                badge.textContent = rows.length;
+                link.appendChild(badge);
             }
         }
 
-        document.getElementById('filter').addEventListener('change', (e) => {
-            currentFilter = e.target.value;
+        function render(rows) {
+            const list = document.getElementById('notifications-list');
+            const empty = document.getElementById('empty');
+            const filtered = currentFilter === 'all'
+                ? rows
+                : rows.filter(r => r.severity === currentFilter);
+            list.innerHTML = filtered.length ? filtered.map(card).join('') : '';
+            empty.hidden = filtered.length > 0;
+        }
+
+        document.querySelectorAll('.btn-group .button').forEach(b => {
+            b.addEventListener('click', () => {
+                document.querySelectorAll('.btn-group .button').forEach(x => x.classList.remove('active'));
+                b.classList.add('active');
+                currentFilter = b.dataset.filter;
+                loadNotifications();
+            });
+        });
+
+        document.getElementById('read-all').addEventListener('click', async () => {
+            await fetch(readAllUrl, {method: 'POST'});
+            loadNotifications();
+        });
+
+        document.getElementById('notifications-list').addEventListener('click', async (e) => {
+            const btn = e.target.closest('.mark-read');
+            if (!btn) return;
+            await fetch(markUrl.replace('__ID__', btn.dataset.id), {method: 'POST'});
             loadNotifications();
         });
 

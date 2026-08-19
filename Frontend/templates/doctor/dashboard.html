@@ -5,20 +5,15 @@
     <h2>Dashboard</h2>
     <p>Benvenuto, diabetologo <strong>{{ doctor_name }}</strong>.</p>
 
-    <h3>Notifiche da leggere ({{ notifications | length }})</h3>
-    {% if notifications %}
-        <ul>
-            {% for n in notifications %}
-                <li>
-                    <em>Paziente {{ n.patient_id }}</em> - {{ n.message }}
-                    (gravità: {{ n.severity }}) -
-                    <a href="{{ url_for('doctor.mark_read', notification_id=n.id) }}">segna come letta</a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>Nessuna notifica in attesa.</p>
-    {% endif %}
+    <h3>Notifiche</h3>
+    <p>
+        {% if notifications %}
+            Hai <strong>{{ notifications | length }} notifiche</strong> da leggere.
+        {% else %}
+            Nessuna notifica in attesa.
+        {% endif %}
+    </p>
+    <a class="button" href="{{ url_for('doctor.notifications') }}">Vai alle notifiche</a>
 
     <h3>Pazienti ({{ patients | length }})</h3>
     <a class="button" href="{{ url_for('doctor.patients') }}">Vai all'elenco pazienti</a>

@@ -6,6 +6,6 @@
 {% block nav %}
     <a href="{{ url_for('doctor.dashboard') }}">Dashboard</a>
     <a href="{{ url_for('doctor.patients') }}">Pazienti</a>
-    <a href="{{ url_for('doctor.notifications') }}">Notifiche</a>
+    <a href="{{ url_for('doctor.notifications') }}">Notifiche{% if unread_notifications %}<span class="nav-badge">{{ unread_notifications | length }}</span>{% endif %}</a>
     <a href="{{ url_for('auth.logout') }}">Esci</a>
 {% endblock %}

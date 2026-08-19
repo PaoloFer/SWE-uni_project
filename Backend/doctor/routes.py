@@ -13,6 +13,13 @@ _usecases = DoctorUseCases(config.DATA_DIR)
 _system = SystemUseCases(config.DATA_DIR)
 
 
+@doctor_bp.context_processor
+def _inject_unread_notifications():
+    if session.get("role") == "doctor":
+        return {"unread_notifications": _usecases.view_notifications(_current_doctor())}
+    return {"unread_notifications": []}
+
+
 def _current_doctor() -> str:
     return str(session.get("entity_id", ""))
 
@@ -23,6 +30,14 @@ def _current_doctor_name(doctor_id: str) -> str:
         if d.get("id") == str(doctor_id):
             return f"{d.get('name', '')} {d.get('surname', '')}".strip()
     return str(doctor_id)
+
+
+def _patient_map() -> dict[str, str]:
+    patients = CsvManager(f"{config.DATA_DIR}/patient.csv", delimiter=";")
+    return {
+        p["id"]: f"{p.get('name', '')} {p.get('surname', '')}".strip()
+        for p in patients.read()
+    }
 
 
 def _is_assigned(patient_id) -> bool:
@@ -269,13 +284,26 @@ def notifications():
 @login_required
 @role_required("doctor")
 def notifications_api():
+    patients = _patient_map()
     rows = _usecases.view_notifications(_current_doctor())
+    for row in rows:
+        row["patient_name"] = patients.get(row.get("patient_id", ""), row.get("patient_id", ""))
     return jsonify(rows)
 
 
-@doctor_bp.route("/notifications/<notification_id>/read")
+@doctor_bp.route("/notifications/<notification_id>/read", methods=["GET", "POST"])
 @login_required
 @role_required("doctor")
 def mark_read(notification_id):
     _usecases.mark_notification_read(notification_id)
+    if request.method == "POST":
+        return jsonify({"ok": True})
     return redirect(url_for("doctor.notifications"))
+
+
+@doctor_bp.route("/notifications/read-all", methods=["POST"])
+@login_required
+@role_required("doctor")
+def mark_all_read():
+    count = _usecases.mark_all_notifications_read(_current_doctor())
+    return jsonify({"ok": True, "count": count})

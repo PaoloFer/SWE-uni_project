@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+from flask import Blueprint, flash, jsonify, redirect, render_template, request, session, url_for
 
 import config
 from auth.decorators import login_required, role_required
@@ -11,6 +11,13 @@ patient_bp = Blueprint("patient", __name__, url_prefix="/patient")
 
 _usecases = PatientUseCases(config.DATA_DIR)
 _system = SystemUseCases(config.DATA_DIR)
+
+
+@patient_bp.context_processor
+def _inject_unread_notifications():
+    if session.get("role") == "patient":
+        return {"unread_notifications": _usecases.view_notifications(_current_patient())}
+    return {"unread_notifications": []}
 
 
 def _current_patient() -> str:
@@ -227,12 +234,29 @@ def notifications():
     )
 
 
-@patient_bp.route("/notifications/<notification_id>/read")
+@patient_bp.route("/notifications/api")
+@login_required
+@role_required("patient")
+def notifications_api():
+    return jsonify(_usecases.view_notifications(_current_patient()))
+
+
+@patient_bp.route("/notifications/<notification_id>/read", methods=["GET", "POST"])
 @login_required
 @role_required("patient")
 def mark_read(notification_id):
     _usecases.mark_notification_read(notification_id, _current_patient())
+    if request.method == "POST":
+        return jsonify({"ok": True})
     return redirect(url_for("patient.notifications"))
+
+
+@patient_bp.route("/notifications/read-all", methods=["POST"])
+@login_required
+@role_required("patient")
+def mark_all_read():
+    count = _usecases.mark_all_notifications_read(_current_patient())
+    return jsonify({"ok": True, "count": count})
 
 
 @patient_bp.route("/logout")

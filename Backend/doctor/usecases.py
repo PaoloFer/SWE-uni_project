@@ -164,3 +164,14 @@ class DoctorUseCases:
                 self.notifications.write(rows)
                 return row
         return None
+
+    def mark_all_notifications_read(self, doctor_id):
+        rows = self.notifications.read()
+        changed = 0
+        for row in rows:
+            if row.get("doctor_id") == str(doctor_id) and row.get("read", "0") == "0":
+                row["read"] = "1"
+                changed += 1
+        if changed:
+            self.notifications.write(rows)
+        return changed
