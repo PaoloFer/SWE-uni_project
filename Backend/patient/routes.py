@@ -4,6 +4,7 @@ import config
 from auth.decorators import login_required, role_required
 from patient.usecases import PatientUseCases
 from system.usecases import SystemUseCases
+from utils.csv_utils import CsvManager
 from utils.validation import FormValidator
 
 patient_bp = Blueprint("patient", __name__, url_prefix="/patient")
@@ -14,6 +15,14 @@ _system = SystemUseCases(config.DATA_DIR)
 
 def _current_patient() -> str:
     return str(session.get("entity_id", ""))
+
+
+def _current_patient_name(patient_id: str) -> str:
+    patients = CsvManager(f"{config.DATA_DIR}/patient.csv", delimiter=";")
+    for p in patients.read():
+        if p.get("id") == str(patient_id):
+            return f"{p.get('name', '')} {p.get('surname', '')}".strip()
+    return str(patient_id)
 
 
 def _dashboard_data(patient_id):
@@ -35,6 +44,7 @@ def dashboard():
         "patient/dashboard.html",
         current_username=session.get("username"),
         entity_id=_current_patient(),
+        patient_name=_current_patient_name(_current_patient()),
         data=_dashboard_data(_current_patient()),
         notifications=notifications,
         reference_doctor=_usecases.view_reference_doctor(_current_patient()),

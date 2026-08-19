@@ -3,7 +3,7 @@
 
 {% block content %}
     <h2>Dashboard</h2>
-    <p>Benvenuto, diabetologo <strong>{{ current_doctor }}</strong>.</p>
+    <p>Benvenuto, diabetologo <strong>{{ doctor_name }}</strong>.</p>
 
     <h3>Notifiche da leggere ({{ notifications | length }})</h3>
     {% if notifications %}

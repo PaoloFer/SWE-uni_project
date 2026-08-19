@@ -17,6 +17,14 @@ def _current_doctor() -> str:
     return str(session.get("entity_id", ""))
 
 
+def _current_doctor_name(doctor_id: str) -> str:
+    doctors = CsvManager(f"{config.DATA_DIR}/doctors.csv", delimiter=";")
+    for d in doctors.read():
+        if d.get("id") == str(doctor_id):
+            return f"{d.get('name', '')} {d.get('surname', '')}".strip()
+    return str(doctor_id)
+
+
 def _is_assigned(patient_id) -> bool:
     associations = CsvManager(f"{config.DATA_DIR}/associations.csv", delimiter=";")
     return any(
@@ -57,6 +65,7 @@ def dashboard():
         patients=patients,
         notifications=notifications,
         current_doctor=_current_doctor(),
+        doctor_name=_current_doctor_name(_current_doctor()),
     )
 
 
@@ -252,6 +261,7 @@ def notifications():
         "doctor/notifications.html",
         notifications=rows,
         current_doctor=_current_doctor(),
+        doctor_name=_current_doctor_name(_current_doctor()),
     )
 
 
