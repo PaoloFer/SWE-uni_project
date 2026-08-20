@@ -83,8 +83,20 @@ id;doctor_id;patient_id;type;severity;message;created_on;read
 81;M2;9;glicemia;media;Paziente 9: iperglicemia pre-pasto 147 mg/dL il 2026-08-16.;2026-08-19;1
 82;M2;9;glicemia;media;Paziente 9: iperglicemia post-pasto 194 mg/dL il 2026-08-16.;2026-08-19;1
 83;M1;1;glicemia;media;Paziente 1: iperglicemia pre-pasto 150 mg/dL il 2026-08-19.;2026-08-19;1
-84;M1;1;glicemia;alta;Paziente 1: iperglicemia post-pasto 320 mg/dL il 2026-08-19.;2026-08-19;0
-85;M1;5;glicemia;media;Paziente 5: iperglicemia pre-pasto 171 mg/dL il 2026-08-19.;2026-08-19;0
-86;M1;6;aderenza;alta;Paziente 6: non aderenza al farmaco da 4 giorni consecutivi.;2026-08-19;0
-87;M1;7;glicemia;media;Paziente 7: iperglicemia post-pasto 196 mg/dL il 2026-08-19.;2026-08-19;0
-88;M1;1;glicemia;media;Paziente 1: iperglicemia pre-pasto 144 mg/dL il 2026-08-19.;2026-08-19;0
+84;M1;1;glicemia;alta;Paziente 1: iperglicemia post-pasto 320 mg/dL il 2026-08-19.;2026-08-19;1
+85;M1;5;glicemia;media;Paziente 5: iperglicemia pre-pasto 171 mg/dL il 2026-08-19.;2026-08-19;1
+86;M1;6;aderenza;alta;Paziente 6: non aderenza al farmaco da 4 giorni consecutivi.;2026-08-19;1
+87;M1;7;glicemia;media;Paziente 7: iperglicemia post-pasto 196 mg/dL il 2026-08-19.;2026-08-19;1
+88;M1;1;glicemia;media;Paziente 1: iperglicemia pre-pasto 144 mg/dL il 2026-08-19.;2026-08-19;1
+89;;1;assunzione;media;Paziente 1: assunzione dimenticata per il farmaco prova (0/5 assunzioni del 2026-08-20).;2026-08-20;0
+90;;1;assunzione;media;Paziente 1: assunzione dimenticata per il farmaco prova (0/3 assunzioni del 2026-08-20).;2026-08-20;0
+91;;5;assunzione;media;Paziente 5: assunzione dimenticata per il farmaco Metformina (0/2 assunzioni del 2026-08-20).;2026-08-20;0
+92;;5;assunzione;media;Paziente 5: assunzione dimenticata per il farmaco Insulina Lantus (0/1 assunzioni del 2026-08-20).;2026-08-20;0
+93;;6;assunzione;media;Paziente 6: assunzione dimenticata per il farmaco Metformina (0/3 assunzioni del 2026-08-20).;2026-08-20;0
+94;;7;assunzione;media;Paziente 7: assunzione dimenticata per il farmaco Glibenclamide (0/2 assunzioni del 2026-08-20).;2026-08-20;0
+95;;8;assunzione;media;Paziente 8: assunzione dimenticata per il farmaco Insulina Novorapid (0/3 assunzioni del 2026-08-20).;2026-08-20;0
+96;;8;assunzione;media;Paziente 8: assunzione dimenticata per il farmaco Metformina (0/2 assunzioni del 2026-08-20).;2026-08-20;0
+97;;9;assunzione;media;Paziente 9: assunzione dimenticata per il farmaco Metformina (0/1 assunzioni del 2026-08-20).;2026-08-20;0
+98;;10;assunzione;media;Paziente 10: assunzione dimenticata per il farmaco Metformina (0/2 assunzioni del 2026-08-20).;2026-08-20;0
+99;;10;assunzione;media;Paziente 10: assunzione dimenticata per il farmaco Insulina Lantus (0/1 assunzioni del 2026-08-20).;2026-08-20;0
+100;M1;1;aderenza;alta;Paziente 1: non aderenza al farmaco prova da 6 giorni consecutivi.;2026-08-20;1

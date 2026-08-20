@@ -3,18 +3,44 @@
 
 {% block content %}
     <h2>Dashboard</h2>
-    <p>Benvenuto, diabetologo <strong>{{ doctor_name }}</strong>.</p>
+    <p class="page-intro">Benvenuto, diabetologo <strong>{{ doctor_name }}</strong>.</p>
+
+    <div class="stats">
+        <div class="stat-card">
+            <span class="stat-icon">👥</span>
+            <div>
+                <div class="stat-value">{{ patients | length }}</div>
+                <div class="stat-label">Pazienti seguiti</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-icon">🔔</span>
+            <div>
+                <div class="stat-value">{{ notifications | length }}</div>
+                <div class="stat-label">Notifiche da leggere</div>
+            </div>
+        </div>
+    </div>
 
     <h3>Notifiche</h3>
-    <p>
-        {% if notifications %}
-            Hai <strong>{{ notifications | length }} notifiche</strong> da leggere.
-        {% else %}
-            Nessuna notifica in attesa.
-        {% endif %}
-    </p>
-    <a class="button" href="{{ url_for('doctor.notifications') }}">Vai alle notifiche</a>
+    <div class="card">
+        <p>
+            {% if notifications %}
+                Hai <strong>{{ notifications | length }} notifiche</strong> da leggere.
+            {% else %}
+                Nessuna notifica in attesa.
+            {% endif %}
+        </p>
+        <div class="form-actions">
+            <a class="button" href="{{ url_for('doctor.notifications') }}">Vai alle notifiche</a>
+        </div>
+    </div>
 
-    <h3>Pazienti ({{ patients | length }})</h3>
-    <a class="button" href="{{ url_for('doctor.patients') }}">Vai all'elenco pazienti</a>
+    <h3>Pazienti</h3>
+    <div class="card">
+        <p>Consulta le schede cliniche dei pazienti che hai in carico.</p>
+        <div class="form-actions">
+            <a class="button" href="{{ url_for('doctor.patients') }}">Vai all'elenco pazienti</a>
+        </div>
+    </div>
 {% endblock %}

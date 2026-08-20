@@ -8,11 +8,19 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
-    <header>
-        <h1>{% block header %}Telemedicina{% endblock %}</h1>
-        <nav>
-            {% block nav %}{% endblock %}
-        </nav>
+    <header class="site-header">
+        <div class="topbar">
+            <a class="brand" href="{{ url_for('auth.login') }}">
+                <span class="brand-mark">➕</span>
+                <span class="brand-name">
+                    Telemedicina
+                    <span class="brand-sub">Diabete Care</span>
+                </span>
+            </a>
+            <nav class="site-nav">
+                {% block nav %}{% endblock %}
+            </nav>
+        </div>
     </header>
 
     <main>
@@ -29,6 +37,10 @@
         {% endwith %}
         {% block content %}{% endblock %}
     </main>
+
+    <footer class="site-footer">
+        Telemedicina &middot; Progetto universitario
+    </footer>
 
     {% block scripts %}{% endblock %}
 </body>
