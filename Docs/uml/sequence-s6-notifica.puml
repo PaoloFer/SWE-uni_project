@@ -1,0 +1,24 @@
+@startuml sequence-s6-notifica
+title UC-S5/S6 - Azioni automatiche di controllo
+autonumber
+control "SystemBackgroundWorker" as WK
+control "SystemUseCases" as SYS
+database "data/glicemia.csv" as GL
+database "data/assunzioni.csv" as AS
+database "data/therapies.csv" as TH
+database "data/notifications.csv" as NOT
+
+loop ogni intervallo configurato (30s)
+  WK -> SYS : run_all_checks()
+  SYS -> GL : flag_out_of_range_glucose()
+  SYS -> AS : check_missing_intakes()
+  SYS -> TH : verify_intake_consistency()
+  alt glicemia fuori soglia / aderenza mancata / assunzioni incoerenti
+    SYS -> NOT : crea notifiche dedicate (gravità definita)
+    SYS --> NOT : elenco notifiche create (deduplicate)
+    else nessuna anomalia
+      SYS --> WK : nessuna notifica da emettere
+    end
+  end
+
+@enduml

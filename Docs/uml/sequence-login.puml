@@ -1,0 +1,22 @@
+@startuml sequence-login
+title UC trasversale - Autenticazione
+autonumber
+actor "Utente" as U
+control "Routes auth" as R
+control "AuthService" as SVC
+database "data/users.csv" as DB
+
+U -> R : GET /auth/login
+R --> U : pagina di login
+U -> R : POST /auth/login (username, password)
+R -> SVC : authenticate(username, password)
+SVC -> DB : verifica password (hash scrypt)
+DB --> SVC : utente / None
+alt Credenziali valide
+  SVC --> R : ruolo ed entity_id
+  R -> U : redirect all'area di ruolo
+  else Credenziali errate
+    R --> U : login con messaggio d'errore
+  end
+
+@enduml

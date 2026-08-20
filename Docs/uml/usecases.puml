@@ -1,0 +1,91 @@
+@startuml usecases
+skinparam shadowing false
+skinparam actorStyle awesome
+left to right direction
+
+' verifica: commenti UC trovati nel codice
+'  - P1: Inserire rilevazione di glicemia
+'  - P2: Aggiungere sintomo
+'  - P3: Registrare assunzione di farmaco/insulina
+'  - P4: Segnalare sintomi, patologie e/o terapie concomitanti
+'  - P5: Contattare il medico di riferimento
+'  - P6: Consultare le proprie notifiche
+'  - M1: Prescrivere una terapia
+'  - M2: Modificare una terapia
+'  - M3: Visualizzare i dati di un paziente
+'  - M4: Visualizzare dati in forma sintetica (andamento glicemia)
+'  - M5: Aggiornare informazioni cliniche del paziente
+'  - M6: Consultare le proprie notifiche
+'  - S2: Verificare coerenza delle assunzioni con le terapie prescritte
+'  - S3: / UC-S4: sollecitare l'inserimento delle assunzioni e alert al paziente
+'  - S5: alert al medico per mancata aderenza (> 3 giorni consecutivi)
+'  - S6: segnalare glicemie oltre soglia al medico, per gravità
+'  - S7: tracciare le operazioni dei medici
+
+actor "Paziente" as PAZ
+actor "Diabetologo" as MED
+actor "Responsabile del servizio" as RESP
+actor "Sistema automatico" as SIST
+
+rectangle "Dominio paziente" {
+  usecase "**P1** Inserire rilevazione di glicemia\n(patient.glicemia)" as UC_P1
+  usecase "**P2** Aggiungere sintomo\n(patient.symptoms)" as UC_P2
+  usecase "**P3** Registrare assunzione di farmaco/insulina\n(patient.assunzioni)" as UC_P3
+  usecase "**P4** Segnalare patologie/terapie concomitanti\n(patient.concomitant)" as UC_P4
+  usecase "**P5** Contattare il medico di riferimento\n(patient.contact)" as UC_P5
+  usecase "**P6** Consultare le proprie notifiche\n(patient.notifications)" as UC_P6
+}
+rectangle "Dominio diabetologo" {
+  usecase "**M1** Prescrivere una terapia\n(doctor.therapy)" as UC_M1
+  usecase "**M2** Modificare una terapia\n(doctor.therapy)" as UC_M2
+  usecase "**M3** Visualizzare i dati di un paziente\n(doctor.patient_detail)" as UC_M3
+  usecase "**M4** Visualizzare l'andamento della glicemia\n(doctor.patient_trend)" as UC_M4
+  usecase "**M5** Aggiornare le informazioni cliniche del paziente\n(doctor.clinical_info)" as UC_M5
+  usecase "**M6** Consultare le proprie notifiche\n(doctor.notifications)" as UC_M6
+}
+rectangle "Dominio amministrativo" {
+  usecase "**A1** Gestire l'anagrafica dei pazienti\n(admin.patients)" as UC_A1
+  usecase "**A2** Gestire l'anagrafica dei medici\n(admin.doctors)" as UC_A2
+  usecase "**A3** Associare pazienti e medici\n(admin.associations)" as UC_A3
+  usecase "**A4** Consultare il registro delle operazioni\n(system.operations)" as UC_A4
+}
+rectangle "Sistema automatico" {
+  usecase "**S1** Eseguire i controlli automatici\n(system.dashboard)" as UC_S1
+  usecase "**S2** Verificare la coerenza assunzioni-terapie\n(system.run_checks)" as UC_S2
+  usecase "**S3** Sollecitare le assunzioni mancanti (paziente)\n(system.run_checks)" as UC_S3
+  usecase "**S4** Alert al paziente per assunzioni mancanti\n(system.run_checks)" as UC_S4
+  usecase "**S5** Alert al medico per mancata aderenza\n(system.run_checks)" as UC_S5
+  usecase "**S6** Segnalare glicemie fuori soglia per gravità\n(system.run_checks)" as UC_S6
+  usecase "**S7** Tracciare le operazioni dei medici\n(system.run_checks)" as UC_S7
+}
+
+PAZ --> UC_P1
+PAZ --> UC_P2
+PAZ --> UC_P3
+PAZ --> UC_P4
+PAZ --> UC_P5
+PAZ --> UC_P6
+MED --> UC_M1
+MED --> UC_M2
+MED --> UC_M3
+MED --> UC_M4
+MED --> UC_M5
+MED --> UC_M6
+RESP --> UC_A1
+RESP --> UC_A2
+RESP --> UC_A3
+RESP --> UC_A4
+SIST --> UC_S1
+SIST --> UC_S2
+SIST --> UC_S3
+SIST --> UC_S4
+SIST --> UC_S5
+SIST --> UC_S6
+SIST --> UC_S7
+
+UC_S1 ..> UC_S2 : include
+UC_S1 ..> UC_S4 : include
+UC_S1 ..> UC_S5 : include
+UC_S1 ..> UC_S6 : include
+
+@enduml

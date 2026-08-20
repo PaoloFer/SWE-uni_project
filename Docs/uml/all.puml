@@ -1,0 +1,11 @@
+@startuml all
+
+!include usecases.puml
+!include sequence-login.puml
+!include sequence-p1-glicemia.puml
+!include sequence-p5-contatto.puml
+!include sequence-m1-terapia.puml
+!include sequence-s6-notifica.puml
+!include routes.puml
+
+@enduml

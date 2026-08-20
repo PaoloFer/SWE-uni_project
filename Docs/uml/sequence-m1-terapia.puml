@@ -1,0 +1,17 @@
+@startuml sequence-m1-terapia
+title UC-M1 - Prescrivere una terapia
+autonumber
+actor "Diabetologo" as MED
+control "Routes doctor.therapy" as R
+control "DoctorUseCases" as UC
+database "data/therapies.csv" as TH
+database "data/operations.csv" as OP
+
+MED -> R : POST /doctor/patients/{id}/therapies (farmaco, freq, dose)
+R -> UC : prescribe_therapy(patient_id, ...)
+UC -> TH : append prescrizione (active=1)
+UC --> R : terapia prescritta
+R -> OP : traccia operazione del medico (UC-S7)
+R --> MED : flash conferma + scheda paziente
+
+@enduml

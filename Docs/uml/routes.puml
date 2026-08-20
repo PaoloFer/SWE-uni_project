@@ -1,0 +1,61 @@
+@startuml routes
+skinparam shadowing false
+left to right direction
+
+' Inventario reale delle route Flask, raggruppate per blueprint
+node "(root)" as (root)_bp {
+  card "/ [GET] -> hello"
+  card "/static/<path:filename> [GET] -> static"
+}
+node "admin" as admin_bp {
+  card "/admin/ [GET] -> admin.dashboard"
+  card "/admin/associations [GET] -> admin.associations"
+  card "/admin/associations/assign [POST] -> admin.assign_doctor"
+  card "/admin/doctors [GET] -> admin.doctors"
+  card "/admin/doctors/<doctor_id>/delete [POST] -> admin.delete_doctor"
+  card "/admin/doctors/<doctor_id>/edit [POST] -> admin.edit_doctor"
+  card "/admin/doctors/create [POST] -> admin.create_doctor"
+  card "/admin/patients [GET] -> admin.patients"
+  card "/admin/patients/<patient_id>/delete [POST] -> admin.delete_patient"
+  card "/admin/patients/<patient_id>/edit [POST] -> admin.edit_patient"
+  card "/admin/patients/create [POST] -> admin.create_patient"
+}
+node "auth" as auth_bp {
+  card "/auth/api/login [POST] -> auth.api_login"
+  card "/auth/api/me [GET] -> auth.api_me"
+  card "/auth/login [GET,POST] -> auth.login"
+  card "/auth/logout [GET] -> auth.logout"
+}
+node "doctor" as doctor_bp {
+  card "/doctor/ [GET] -> doctor.dashboard"
+  card "/doctor/notifications [GET] -> doctor.notifications"
+  card "/doctor/notifications/<notification_id>/read [GET,POST] -> doctor.mark_read"
+  card "/doctor/notifications/api [GET] -> doctor.notifications_api"
+  card "/doctor/notifications/read-all [POST] -> doctor.mark_all_read"
+  card "/doctor/patients [GET] -> doctor.patients"
+  card "/doctor/patients/<int:patient_id> [GET] -> doctor.patient_detail"
+  card "/doctor/patients/<int:patient_id>/clinical [GET,POST] -> doctor.clinical_info"
+  card "/doctor/patients/<int:patient_id>/therapies [GET,POST] -> doctor.therapy"
+  card "/doctor/patients/<int:patient_id>/trend [GET] -> doctor.patient_trend"
+}
+node "patient" as patient_bp {
+  card "/patient/ [GET] -> patient.dashboard"
+  card "/patient/assunzioni [GET,POST] -> patient.assunzioni"
+  card "/patient/concomitanti [GET,POST] -> patient.concomitant"
+  card "/patient/contatto-medico [GET,POST] -> patient.contact"
+  card "/patient/glicemia [GET,POST] -> patient.glicemia"
+  card "/patient/logout [GET] -> patient.logout"
+  card "/patient/notifications [GET] -> patient.notifications"
+  card "/patient/notifications/<notification_id>/read [GET,POST] -> patient.mark_read"
+  card "/patient/notifications/api [GET] -> patient.notifications_api"
+  card "/patient/notifications/read-all [POST] -> patient.mark_all_read"
+  card "/patient/sintomi [GET,POST] -> patient.symptoms"
+}
+node "system" as system_bp {
+  card "/system/ [GET] -> system.dashboard"
+  card "/system/checks [POST] -> system.run_checks"
+  card "/system/logout [GET] -> system.logout"
+  card "/system/operations [GET] -> system.operations"
+}
+
+@enduml

@@ -1,0 +1,22 @@
+@startuml sequence-p1-glicemia
+title UC-P1 - Inserimento rilevazione di glicemia
+autonumber
+actor "Paziente" as PAZ
+control "Routes patient.glicemia" as R
+control "PatientUseCases" as UC
+database "data/glicemia.csv" as GL
+control "SystemUseCases" as SYS
+database "data/notifications.csv" as NOT
+
+PAZ -> R : POST /patient/glicemia (data, ora, pasto, valore)
+R -> UC : record_glicemia(patient_id, ...)
+UC -> GL : append rilevazione
+UC --> R : rilevazione salvata
+opt Valore fuori soglia (pre: 80-130, post: <=180)
+  R -> SYS : alert_glucose(patient_id, value, meal, date)
+  SYS -> NOT : crea notifica alert glicemia (gravità)
+  SYS --> R : notifica creata per il medico di riferimento
+end
+R --> PAZ : flash conferma + redirect /patient/glicemia
+
+@enduml

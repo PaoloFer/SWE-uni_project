@@ -1,0 +1,22 @@
+@startuml sequence-p5-contatto
+title UC-P5 - Contattare il medico di riferimento
+autonumber
+actor "Paziente" as PAZ
+control "Routes patient.contact" as R
+control "PatientUseCases" as UC
+database "data/associations.csv" as AS
+database "data/contacts.csv" as CT
+database "data/notifications.csv" as NOT
+
+PAZ -> R : POST /patient/contatto-medico (messaggio)
+R -> UC : contact_doctor(patient_id, message)
+UC -> AS : trova medico di riferimento
+UC --> AS : doctor_id (se assegnato)
+UC -> CT : append contatto
+opt Esiste un medico di riferimento
+  UC -> NOT : crea notifica type=contact per il medico
+end
+UC --> R : contatto registrato
+R --> PAZ : flash conferma + redirect
+
+@enduml
