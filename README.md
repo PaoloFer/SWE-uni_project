@@ -9,19 +9,21 @@
 
 ### Prerequisiti
 
-- [Python 3.12](https://www.python.org/downloads/) installato.
+- [Python 3.10 o successivo](https://www.python.org/downloads/) installato
+  (il progetto è stato verificato con Python 3.12).
 
-Il comando che avvia Python dipende dal sistema operativo:
+Il nome del comando dipende dal sistema operativo e da come è stato installato
+Python:
 
-- Windows: `py -3.12`
+- Windows: `python`
 - macOS/Linux: `python3`
 
-Verifica l'installazione con uno dei seguenti comandi.
+Verifica versione e disponibilità dell'interprete prima di procedere.
 
-Windows:
+Windows (PowerShell o prompt dei comandi):
 
 ```powershell
-py -3.12 --version
+python --version
 ```
 
 macOS/Linux:
@@ -30,8 +32,15 @@ macOS/Linux:
 python3 --version
 ```
 
-L'output deve indicare Python 3.12. Nei comandi successivi viene usato il
-comando appropriato per ciascun sistema operativo.
+L'output deve indicare una versione pari o successiva alla 3.10. Su Windows,
+se `python` non è disponibile ma è installato il Python Launcher, è possibile
+usare `py` come alternativa:
+
+```powershell
+py --version
+```
+
+`py` è quindi un fallback specifico di Windows, non un requisito del progetto.
 
 ### Setup del virtualenv
 
@@ -47,13 +56,20 @@ Poi crea il virtualenv con il comando adatto al sistema operativo.
 Windows:
 
 ```powershell
-py -3.12 -m venv .venv
+python -m venv .venv
 ```
 
 macOS/Linux:
 
 ```bash
 python3 -m venv .venv
+```
+
+Solo su Windows, se `python` non è riconosciuto ma `py --version` funziona,
+crea il virtualenv con:
+
+```powershell
+py -m venv .venv
 ```
 
 Il virtualenv viene creato solo durante il primo setup e va rigenerato se la
@@ -110,17 +126,26 @@ Il server parte su http://localhost:5000.
 Probabilmente il venv non è stato creato o attivato: ripeti i passi di setup
 sopra prima di avviare il server.
 
-### Riepilogo dei comandi Python
+### Risoluzione dei problemi
 
-Prima di attivare il virtualenv:
+Se su Windows `python` apre il Microsoft Store oppure non viene riconosciuto:
 
-| Sistema operativo | Comando |
-|-------------------|---------|
-| Windows | `py -3.12` |
-| macOS/Linux | `python3` |
+- verifica che Python sia installato da [python.org](https://www.python.org/downloads/);
+- verifica che l'opzione per aggiungere Python al `PATH` sia abilitata;
+- in alternativa, prova `py --version` e usa `py -m venv .venv`.
 
-Dopo aver attivato il virtualenv, su tutti i sistemi si usa:
+Se su Linux la creazione del virtualenv segnala che il modulo `venv` non è
+disponibile, installa il pacchetto fornito dalla distribuzione, per esempio su
+Ubuntu/Debian:
 
 ```bash
-python
+sudo apt install python3-venv
+```
+
+Dopo l'attivazione del virtualenv, su tutti i sistemi i comandi sono gli stessi:
+
+```bash
+python --version
+python -m pip install -r requirements.txt
+python main.py
 ```
