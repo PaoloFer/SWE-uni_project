@@ -1,2 +1,15 @@
 patient_id;type;description;period
-1;terapia;farmaco X;da giugno 2026 ad agosto 2026
+1;terapia;Ramipril 5 mg per ipertensione;da gennaio 2026
+1;patologia;ipertensione arteriosa lieve;diagnosticata nel 2025
+1;terapia;piano alimentare a ridotto contenuto di zuccheri semplici;da luglio 2026
+1;terapia;camminata a passo sostenuto per 30 minuti;cinque giorni alla settimana
+2;terapia;sensore per monitoraggio continuo della glicemia;da giugno 2026
+3;terapia;Atorvastatina 10 mg;da marzo 2026
+4;patologia;ipertensione arteriosa;dal 2023
+4;terapia;Amlodipina 5 mg;da febbraio 2026
+5;terapia;Ramipril 5 mg;da maggio 2026
+6;patologia;dislipidemia;diagnosticata nel 2024
+7;sintomo;formicolio intermittente ai piedi;da agosto 2026
+8;terapia;Levotiroxina 75 mcg;da novembre 2024
+9;terapia;Losartan 50 mg;da aprile 2026
+10;patologia;pregresso diabete gestazionale;gravidanza 2022

@@ -1,8 +1,11 @@
 patient_id;risk_factors;past_pathologies;comorbidities;updated_by;updated_on
-1;hlklhfkjdshf;adfasdf;akdkfjadsf;M1;2026-08-14
-5;fumatore;appendicectomia 2020;ipertensione;M1;2026-08-19
-6;obesità (BMI 32);;dislipidemia;M1;2026-08-19
-7;ex-fumatore;gastrite;;M1;2026-08-19
-8;;tiroidite di Hashimoto;ipertensione;M2;2026-08-19
-9;fumatore;;;M2;2026-08-19
-10;;pregressa gravidanza con diabete;;M3;2026-08-19
+1;sovrappeso e familiarità per diabete;appendicectomia nel 2018;ipertensione lieve;M1;2026-09-02
+2;diabete tipo 1 dall'adolescenza;episodio ipoglicemico nel 2024;nessuna comorbidità nota;M2;2026-08-28
+3;sedentarietà;colecistectomia nel 2021;ipercolesterolemia controllata;M3;2026-09-01
+4;obesità e familiarità cardiovascolare;nessun precedente chirurgico rilevante;ipertensione e dislipidemia;M2;2026-09-10
+5;alimentazione irregolare;appendicectomia nel 2020;ipertensione controllata;M1;2026-08-29
+6;obesità BMI 32 e sedentarietà;nessuna patologia pregressa rilevante;dislipidemia;M1;2026-09-10
+7;ex fumatore;gastrite cronica;neuropatia periferica lieve;M1;2026-09-03
+8;familiarità per patologie autoimmuni;tiroidite di Hashimoto;ipotiroidismo in trattamento;M2;2026-09-05
+9;fumatore e lavoro sedentario;bronchite ricorrente;ipertensione;M2;2026-09-12
+10;pregresso diabete gestazionale;taglio cesareo nel 2022;nessuna comorbidità attuale;M3;2026-09-08

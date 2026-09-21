@@ -1,1 +1,17 @@
 id;doctor_id;operation;details;executed_on
+1;M1;prescrizione_terapia;Prescritta Metformina 500 mg al paziente 1;2026-07-15T10:20:00
+2;M1;modifica_terapia;Aggiornate le indicazioni della Metformina per il paziente 1;2026-09-02T09:35:00
+3;M1;prescrizione_terapia;Prescritta Sitagliptin 100 mg al paziente 1;2026-09-02T09:37:00
+4;M2;prescrizione_terapia;Prescritta Gliclazide 30 mg al paziente 4;2026-08-30T11:10:00
+5;M2;aggiornamento_info_cliniche;Aggiornato quadro clinico del paziente 4;2026-09-10T15:25:00
+6;M1;modifica_terapia;Rivalutata dose di Metformina per il paziente 6;2026-09-10T12:40:00
+7;M1;prescrizione_terapia;Prescritta Dapagliflozin 10 mg al paziente 6;2026-09-10T12:42:00
+8;M2;modifica_terapia;Confermata Metformina 1000 mg per il paziente 9;2026-09-01T16:05:00
+9;M3;aggiornamento_info_cliniche;Aggiornata anamnesi del paziente 10;2026-09-08T10:15:00
+10;M2;aggiornamento_info_cliniche;Aggiornato controllo del paziente 2 dopo episodio ipoglicemico;2026-08-28T14:50:00
+11;M1;aggiornamento_info_cliniche;Registrato miglioramento del profilo glicemico del paziente 1;2026-09-05T09:20:00
+12;M1;modifica_terapia;Confermata Metformina 500 mg due volte al giorno per il paziente 1;2026-09-12T10:10:00
+13;M1;aggiornamento_info_cliniche;Rivalutati fattori di rischio e pressione del paziente 5;2026-09-13T11:35:00
+14;M1;modifica_terapia;Verificata tollerabilità della Dapagliflozin per il paziente 6;2026-09-16T14:15:00
+15;M1;aggiornamento_info_cliniche;Controllata la neuropatia periferica del paziente 7;2026-09-17T16:20:00
+16;M1;modifica_terapia;Confermata Sitagliptin 100 mg al giorno per il paziente 1;2026-09-18T09:45:00

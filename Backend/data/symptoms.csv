@@ -1,12 +1,19 @@
 patient_id;reported_on;symptom
-1;2026-08-15;nausea
-5;2026-08-12;spossatezza
-5;2026-08-14;nausea
-6;2026-08-11;mal di testa
-6;2026-08-13;vista offuscata
-7;2026-08-15;dolori alle gambe
-8;2026-08-16;palpitazioni
-9;2026-08-14;sete frequente
-10;2026-08-15;formicolio alle mani
-1;2026-08-19;afaòdslkfj
-1;2026-08-19;324u2398842
+1;2026-08-11;sete più frequente del solito
+1;2026-08-18;sonnolenza dopo pranzo
+1;2026-09-03;lieve stanchezza nel pomeriggio
+1;2026-09-09;riduzione della sete rispetto al mese precedente
+1;2026-09-16;energia regolare durante la giornata
+2;2026-08-28;tremori e sudorazione prima di colazione
+2;2026-09-18;sete intensa dopo pranzo
+3;2026-09-05;nessun sintomo rilevante
+4;2026-08-30;vista offuscata occasionale
+4;2026-09-15;stanchezza persistente
+5;2026-08-16;lieve nausea dopo colazione
+6;2026-08-14;mal di testa e spossatezza
+6;2026-09-11;miglioramento della stanchezza
+7;2026-08-31;capogiro al risveglio
+8;2026-09-02;lieve formicolio ai piedi
+9;2026-08-27;sete frequente e bocca asciutta
+9;2026-09-12;minzione frequente durante la notte
+10;2026-09-01;stanchezza dopo i pasti

@@ -1,3 +1,9 @@
 id;patient_id;doctor_id;message;created_on
-1;1;M1;"prova
-";2026-08-14
+1;1;M1;Buongiorno dottore, i valori delle ultime due settimane sono migliorati. Conferma di proseguire con la terapia attuale?;2026-09-18
+2;2;M2;Ieri dopo pranzo ho rilevato 238 mg/dL nonostante l'insulina. Vorrei un consiglio sulla dose.;2026-09-18
+3;4;M2;Continuo ad avere stanchezza e valori sopra 200 dopo i pasti. Possiamo anticipare il controllo?;2026-09-18
+4;6;M1;Con il nuovo farmaco la sete è diminuita e non ho avuto effetti indesiderati.;2026-09-16
+5;8;M2;Avrei bisogno di confermare l'orario serale dell'insulina durante il prossimo viaggio.;2026-09-17
+6;10;M3;I valori sono stabili. Devo ripetere gli esami prima della prossima visita?;2026-09-18
+7;1;M1;Da quando ho iniziato la Sitagliptin i valori dopo i pasti sono più bassi e non ho avuto disturbi.;2026-09-05
+8;1;M1;Ho quasi terminato la Metformina. Può confermare che devo continuare con la stessa dose?;2026-09-12
