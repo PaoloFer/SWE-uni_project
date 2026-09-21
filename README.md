@@ -9,20 +9,56 @@
 
 ### Prerequisiti
 
-- [Python 3.12](https://www.python.org/downloads/) installato e disponibile da terminale (`python --version`).
+- [Python 3.12](https://www.python.org/downloads/) installato.
+
+Il comando che avvia Python dipende dal sistema operativo:
+
+- Windows: `py -3.12`
+- macOS/Linux: `python3`
+
+Verifica l'installazione con uno dei seguenti comandi.
+
+Windows:
+
+```powershell
+py -3.12 --version
+```
+
+macOS/Linux:
+
+```bash
+python3 --version
+```
+
+L'output deve indicare Python 3.12. Nei comandi successivi viene usato il
+comando appropriato per ciascun sistema operativo.
 
 ### Setup del virtualenv
 
 Il progetto usa un ambiente Python isolato (venv) per le dipendenze del backend.
-Vai nella cartella `Backend` e crea il venv:
+Apri un terminale nella cartella principale del progetto ed entra in `Backend`:
 
 ```bash
 cd Backend
-python -m venv .venv
 ```
 
-Il venv viene creato al primo setup e va rigenerato solo se cancellato.
-La cartella `.venv/` non viene caricata su GitHub (è in `.gitignore`).
+Poi crea il virtualenv con il comando adatto al sistema operativo.
+
+Windows:
+
+```powershell
+py -3.12 -m venv .venv
+```
+
+macOS/Linux:
+
+```bash
+python3 -m venv .venv
+```
+
+Il virtualenv viene creato solo durante il primo setup e va rigenerato se la
+cartella `.venv` viene cancellata. La cartella contiene file locali e non deve
+essere aggiunta al repository.
 
 ### Attivazione del venv
 
@@ -50,15 +86,15 @@ riferimento all'interprete del venv.
 ### Installazione delle dipendenze
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 Installa Flask e tutte le dipendenze elencate in `requirements.txt`.
 Quando installi un nuovo pacchetto, aggiorna il file con:
 
 ```bash
-pip install <nuovo-pacchetto>
-pip freeze > requirements.txt
+python -m pip install <nuovo-pacchetto>
+python -m pip freeze > requirements.txt
 ```
 
 ### Avvio del server
@@ -73,3 +109,18 @@ Il server parte su http://localhost:5000.
 
 Probabilmente il venv non è stato creato o attivato: ripeti i passi di setup
 sopra prima di avviare il server.
+
+### Riepilogo dei comandi Python
+
+Prima di attivare il virtualenv:
+
+| Sistema operativo | Comando |
+|-------------------|---------|
+| Windows | `py -3.12` |
+| macOS/Linux | `python3` |
+
+Dopo aver attivato il virtualenv, su tutti i sistemi si usa:
+
+```bash
+python
+```
